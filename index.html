@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>กลุ่มออมทรัพย์นะห์ลา — Realtime</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0F6E56;--teal-l:#E1F5EE;--teal-m:#1D9E75;--teal-d:#085041;
+  --amber:#854F0B;--amber-l:#FAEEDA;--amber-m:#EF9F27;
+  --red:#A32D2D;--red-l:#FCEBEB;
+  --green:#3B6D11;--green-l:#EAF3DE;
+  --purple:#534AB7;--purple-l:#EEEDFE;
+  --g9:#1a1a1a;--g7:#444;--g5:#777;--g3:#ccc;--g1:#f5f5f5;--g0:#fafafa;
+  --white:#fff;--sw:230px;
+  --font:'Sarabun',sans-serif;--mono:'IBM Plex Mono',monospace;
+}
+body{font-family:var(--font);background:#eef2f0;color:var(--g9);display:flex;min-height:100vh;font-size:15px}
+
+/* Sidebar */
+#sidebar{width:var(--sw);min-height:100vh;background:var(--teal-d);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo-title{font-size:17px;font-weight:700;color:#fff}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;font-family:var(--mono)}
+.sync-status{margin-top:8px;display:flex;align-items:center;gap:6px;font-size:11px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#888;flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:#4ade80}.sync-dot.syncing{background:var(--amber-m);animation:pulse .8s infinite}
+.sync-dot.err{background:#f87171}
+.sync-label{color:rgba(255,255,255,.5);font-size:11px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.nav{padding:10px 0;flex:1;overflow-y:auto}
+.nav-sec{padding:12px 18px 4px;font-size:10px;font-weight:600;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.13);color:#fff;border-left-color:var(--amber-m);font-weight:500}
+.nav-icon{width:17px;height:17px;flex-shrink:0}
+.sidebar-bot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.08)}
+.admin-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(239,159,39,.2);color:var(--amber-m);font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600;cursor:pointer;width:100%;justify-content:center}
+.admin-badge:hover{background:rgba(239,159,39,.35)}
+
+/* Main */
+#main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#admin-bar{background:linear-gradient(90deg,#412402,#633806);padding:5px 28px;display:none;align-items:center;gap:12px;font-size:12px;color:rgba(255,220,120,.85)}
+#admin-bar.on{display:flex}
+.topbar{background:var(--white);border-bottom:1px solid var(--g3);padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:600}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.content{padding:22px 26px;flex:1}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--white);border-radius:12px;padding:16px 18px;border:1px solid var(--g3);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%}
+.stat-teal::after{background:var(--teal-m)}.stat-green::after{background:var(--green)}.stat-amber::after{background:var(--amber-m)}.stat-red::after{background:var(--red)}
+.stat-lbl{font-size:11px;color:var(--g5);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.stat-val{font-size:24px;font-weight:700;margin-top:4px;line-height:1}
+.stat-sub{font-size:12px;color:var(--g5);margin-top:3px}
+.stat-teal .stat-val{color:var(--teal)}.stat-green .stat-val{color:var(--green)}.stat-amber .stat-val{color:var(--amber)}.stat-red .stat-val{color:var(--red)}
+
+/* Cards */
+.card{background:var(--white);border-radius:12px;border:1px solid var(--g3);margin-bottom:16px;overflow:hidden}
+.card-header{padding:13px 18px;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-title{font-size:14px;font-weight:600}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--g5);letter-spacing:.04em;text-transform:uppercase;background:var(--g0);border-bottom:1px solid var(--g3)}
+.tbl td{padding:9px 14px;border-bottom:1px solid #f0f0f0;font-size:13.5px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#f5faf8}
+.mono{font-family:var(--mono);font-size:12px}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.b-ok{background:var(--green-l);color:var(--green)}.b-warn{background:var(--amber-l);color:var(--amber)}
+.b-danger{background:var(--red-l);color:var(--red)}.b-info{background:var(--teal-l);color:var(--teal)}
+.b-purple{background:var(--purple-l);color:var(--purple)}.b-gray{background:var(--g1);color:var(--g5)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);white-space:nowrap}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal-m)}
+.btn-outline{background:transparent;border:1px solid var(--g3);color:var(--g7)}.btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+.btn-danger{background:var(--red-l);color:var(--red);border:1px solid #f5c0c0}.btn-danger:hover{background:#f5c0c0}
+.btn-warn{background:var(--amber-l);color:var(--amber);border:1px solid #fac775}
+.btn-purple{background:var(--purple-l);color:var(--purple);border:1px solid #afa9ec}
+.btn-sm{padding:4px 10px;font-size:12px}.btn-xs{padding:3px 7px;font-size:11px}
+.btn-grp{display:flex;gap:5px;flex-wrap:wrap}
+
+/* Forms */
+.fg{display:grid;gap:14px}.fg2{grid-template-columns:1fr 1fr}.fg3{grid-template-columns:1fr 1fr 1fr}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--g7);margin-bottom:5px}
+.form-control{width:100%;padding:8px 12px;border:1px solid var(--g3);border-radius:8px;font-size:14px;font-family:var(--font);color:var(--g9);background:var(--white);transition:border .15s}
+.form-control:focus{outline:none;border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+.form-control:read-only{background:var(--g0)}
+select.form-control{cursor:pointer}
+.form-row{display:flex;gap:14px;margin-bottom:14px}.form-row .form-group{flex:1}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:all}
+.mo-box{background:var(--white);border-radius:16px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+.mo-box.wide{width:680px}
+.mo-hd{padding:16px 22px 12px;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1}
+.mo-title{font-size:16px;font-weight:700}
+.mo-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--g5);padding:0 4px}
+.mo-body{padding:20px 22px}
+.mo-ft{padding:12px 22px;border-top:1px solid var(--g1);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--white)}
+
+/* Pages */
+.page{display:none}.page.active{display:block}
+.page-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+
+/* Alert */
+.alert{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;border:1px solid transparent}
+.alert-warn{background:var(--amber-l);color:var(--amber);border-color:#fac775}
+.alert-danger{background:var(--red-l);color:var(--red);border-color:#f7c1c1}
+.alert-ok{background:var(--green-l);color:var(--green);border-color:#c0dd97}
+.alert-info{background:var(--teal-l);color:var(--teal);border-color:#9FE1CB}
+
+/* Progress */
+.prog{height:6px;background:var(--g1);border-radius:3px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;background:var(--teal-m);border-radius:3px}
+
+/* Search */
+.srch{position:relative}.srch input{padding-left:32px;width:240px}
+.srch-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--g3);font-size:14px;pointer-events:none}
+
+/* Loading spinner */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--teal-d);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;max-width:340px;display:flex;align-items:center;gap:8px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.err{background:var(--red)}
+
+/* Confirm */
+#cdlg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center}
+#cdlg.open{display:flex}
+#cbox{background:var(--white);border-radius:14px;padding:28px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+#cmsg{font-size:15px;font-weight:500;margin-bottom:18px;line-height:1.5}
+#cacts{display:flex;gap:8px;justify-content:flex-end}
+
+/* Setup screen */
+#setup{position:fixed;inset:0;background:rgba(8,80,65,.97);z-index:1000;display:flex;align-items:center;justify-content:center}
+#setup-box{background:var(--white);border-radius:20px;padding:36px 40px;width:480px;max-width:95vw}
+#setup h2{font-size:22px;font-weight:700;color:var(--teal-d);margin-bottom:6px}
+#setup p{font-size:14px;color:var(--g5);margin-bottom:24px;line-height:1.6}
+#setup-url{font-family:var(--mono);font-size:13px}
+.setup-steps{margin:16px 0;padding:16px;background:var(--g0);border-radius:10px;font-size:13px;color:var(--g7);line-height:2}
+.setup-steps strong{color:var(--teal-d)}
+
+/* Cashflow sum */
+.cf-sum{background:var(--teal-l);border-radius:8px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+
+/* Print */
+@media print{
+  #sidebar,#topbar,.topbar,#admin-bar,.no-print,#toast,#cdlg,.mo,button,#setup{display:none!important}
+  #main{margin-left:0!important}
+  .content{padding:0!important}
+  .page{display:none!important}
+  #print-area{display:block!important;padding:0}
+  @page{size:A4 portrait;margin:12mm 14mm}
+}
+#print-area{display:none}
+
+/* Print form */
+.pf-page{width:210mm;min-height:297mm;font-family:'Sarabun',sans-serif;font-size:13pt;color:#111;background:#fff;padding:14mm 16mm;box-sizing:border-box}
+.pf-hdr{display:flex;justify-content:space-between;margin-bottom:6mm;padding-bottom:4mm;border-bottom:2.5pt solid #0F6E56}
+.pf-org-name{font-size:17pt;font-weight:700;color:#085041}
+.pf-org-sub{font-size:10pt;color:#555;margin-top:2px}
+.pf-doc-box{background:#f0f9f5;border:1pt solid #0F6E56;border-radius:5pt;padding:8pt 12pt;text-align:center;min-width:100pt}
+.pf-doc-id{font-size:14pt;font-weight:700;color:#0F6E56;font-family:'IBM Plex Mono',monospace}
+.pf-title-main{text-align:center;font-size:16pt;font-weight:700;color:#085041;margin-bottom:3mm}
+.pf-halal{background:#e8f5f0;border:1pt solid #9FE1CB;border-radius:4pt;padding:5pt 10pt;text-align:center;margin:3mm 0;font-size:10pt;color:#0F6E56;font-weight:500}
+.pf-sec-title{font-size:11pt;font-weight:700;color:#085041;border-bottom:1pt solid #c0e8d8;padding-bottom:2pt;margin:4mm 0 2mm}
+.pf-grid2{display:grid;grid-template-columns:1fr 1fr;border:1pt solid #bbb}
+.pf-row{display:grid;border-bottom:1pt solid #ddd}.pf-row:last-child{border-bottom:none}
+.pf-lbl{background:#f5faf8;color:#444;font-weight:600;font-size:10pt;border-right:1pt solid #ddd;padding:5pt 8pt}
+.pf-val{color:#111;padding:5pt 8pt;font-size:11pt}
+.pf-amounts{background:#f0f9f5;border:2pt solid #0F6E56;border-radius:6pt;padding:8pt 14pt;margin:3mm 0;display:grid;grid-template-columns:repeat(3,1fr);gap:6pt;text-align:center}
+.pf-amt-lbl{font-size:9pt;color:#555;font-weight:600}
+.pf-amt-val{font-size:14pt;font-weight:700;color:#085041;font-family:'IBM Plex Mono',monospace;margin-top:2pt}
+.pf-amt-val.red{color:#A32D2D}
+.pf-amt-sep{border-left:1pt solid #9FE1CB}
+.pf-tbl{width:100%;border-collapse:collapse;border:1pt solid #999;margin-top:2mm;font-size:10pt}
+.pf-tbl th{background:#085041;color:#fff;padding:5pt 6pt;text-align:center;font-size:9.5pt;font-weight:600;border:1pt solid #0a5a45}
+.pf-tbl td{padding:4.5pt 6pt;border:1pt solid #ccc;text-align:center;vertical-align:middle}
+.pf-tbl tr:nth-child(even) td{background:#f8fcfa}
+.pf-tbl tfoot td{background:#e8f5f0;font-weight:700;border:1pt solid #9FE1CB}
+.pf-cond{background:#fffbf0;border:1pt solid #fac775;border-radius:4pt;padding:6pt 10pt;font-size:9.5pt;color:#5C4000;margin:3mm 0;line-height:1.7}
+.pf-sigs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12pt;margin-top:8mm;text-align:center}
+.pf-sig-line{border-top:1.5pt solid #999;padding-top:4pt;font-size:9.5pt;color:#444;margin-top:22pt}
+.pf-stamp{border:2pt dashed #0F6E56;border-radius:6pt;width:70pt;height:50pt;display:flex;align-items:center;justify-content:center;font-size:9pt;color:#0F6E56;margin:0 auto;text-align:center}
+.pf-footer{border-top:2pt solid #0F6E56;margin-top:8mm;padding-top:4pt;display:flex;justify-content:space-between;font-size:9pt;color:#666}
+</style>
+</head>
+<body>
+
+<!-- PRINT AREA -->
+<div id="print-area"></div>
+
+<!-- SETUP SCREEN -->
+<div id="setup">
+  <div id="setup-box">
+    <h2>🌿 กลุ่มออมทรัพย์นะห์ลา</h2>
+    <p>ใส่ URL Google Apps Script เพื่อเชื่อมกับฐานข้อมูล Google Sheets</p>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Apps Script Web App URL</label>
+      <input class="form-control setup-url" id="setup-url-input" placeholder="https://script.google.com/macros/s/..." style="font-size:12px">
+    </div>
+    <div class="setup-steps">
+      <strong>ขั้นตอนตั้งค่า (ใช้ไฟล์ nahla_apps_script_v2.gs):</strong><br>
+      1. เปิด Google Sheet → Extensions → Apps Script<br>
+      2. ลบโค้ดเดิม → วางโค้ดจาก <strong>nahla_apps_script_v2.gs</strong><br>
+      3. รัน <strong>initSheets()</strong> ก่อน 1 ครั้ง<br>
+      4. Deploy → New deployment → Web app<br>
+      5. Execute as: <strong>Me</strong> · Access: <strong>Anyone</strong><br>
+      6. Copy URL → วางด้านบน<br>
+      <span style="color:#A32D2D;font-size:12px">⚠ ต้อง Deploy ใหม่ทุกครั้งที่แก้โค้ด</span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="connectSheet()" style="flex:1" id="connect-btn">เชื่อมต่อ Google Sheets</button>
+      <button class="btn btn-outline" onclick="useLocalMode()" style="flex:1">ใช้แบบออฟไลน์</button>
+    </div>
+    <div id="setup-err" style="margin-top:10px;font-size:13px;color:var(--red);display:none"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="logo">
+    <div class="logo-title">กลุ่มออมทรัพย์นะห์ลา</div>
+    <div class="logo-sub">NAHLA · REALTIME</div>
+    <div class="sync-status">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span class="sync-label" id="sync-label">กำลังเชื่อมต่อ...</span>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-sec">เมนูหลัก</div>
+    <div class="nav-item active" data-page="dashboard"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>ภาพรวม</div>
+    <div class="nav-sec">ข้อมูล</div>
+    <div class="nav-item" data-page="members"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>ทะเบียนสมาชิก</div>
+    <div class="nav-item" data-page="loans"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>ข้อมูลสินเชื่อ</div>
+    <div class="nav-item" data-page="payments"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>บันทึกชำระ</div>
+    <div class="nav-sec">การเงิน</div>
+    <div class="nav-item" data-page="cashflow"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>รายรับ-จ่าย</div>
+    <div class="nav-item" data-page="npl"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>หนี้ค้าง / NPL</div>
+    <div class="nav-sec">เอกสาร</div>
+    <div class="nav-item" data-page="apply"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>แบบขอสินเชื่อ</div>
+  </div>
+  <div class="sidebar-bot">
+    <div class="admin-badge" onclick="toggleAdmin()" id="admin-btn">🔐 Admin Mode</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:8px;text-align:center" id="db-mode-label">Google Sheets</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="admin-bar"><span style="font-weight:600;color:#fde68a">⚡ ADMIN MODE</span><span style="margin-left:8px">— แก้ไข ลบ และจัดการข้อมูลทั้งหมดได้</span><button class="btn btn-xs btn-warn no-print" onclick="toggleAdmin()" style="margin-left:auto">ออก</button></div>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="topbar-title" id="page-title">ภาพรวม</span>
+      <span id="admin-chip" style="display:none" class="badge b-warn no-print">Admin</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline btn-sm no-print" onclick="syncAll()" id="sync-btn">↻ Sync</button>
+      <span style="font-size:12px;color:var(--g5);font-family:var(--mono)" id="clock"></span>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stat-grid" id="stat-grid"><div class="stat-card" style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g5)">กำลังโหลดข้อมูล...</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card"><div class="card-header"><span class="card-title">สินเชื่อที่กำลังผ่อน</span></div><div style="padding:0"><table class="tbl"><thead><tr><th>ชื่อ</th><th>คงค้าง</th><th>สถานะ</th></tr></thead><tbody id="dash-loans"><tr><td colspan="3" style="text-align:center;color:var(--g5);padding:20px">กำลังโหลด...</td></tr></tbody></table></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">หนี้ค้างเกิน 1 ปี</span></div><div style="padding:0"><table class="tbl"><thead><tr><th>ชื่อ</th><th>ค้าง (บาท)</th><th>ประเภท</th></tr></thead><tbody id="dash-npl"><tr><td colspan="3" style="text-align:center;color:var(--g5);padding:20px">กำลังโหลด...</td></tr></tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div class="page" id="page-members">
+      <div class="page-bar">
+        <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-member" placeholder="ค้นหา..." oninput="renderMembers()"></div>
+        <div class="btn-grp no-print">
+          <button class="btn btn-primary" onclick="openMemberForm()">+ เพิ่มสมาชิก</button>
+          <button class="btn btn-outline" onclick="refreshPage('members')">↻ รีเฟรช</button>
+        </div>
+      </div>
+      <div class="card"><div style="padding:0">
+        <table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์</th><th>ที่อยู่</th><th>วันเข้า</th><th>หุ้น (บาท)</th><th class="no-print">จัดการ</th></tr></thead><tbody id="members-tbody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- LOANS -->
+    <div class="page" id="page-loans">
+      <div class="page-bar">
+        <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-loan" placeholder="ค้นหา..." oninput="renderLoans()"></div>
+        <div class="btn-grp no-print">
+          <button class="btn btn-primary" onclick="openLoanForm()">+ เพิ่มสินเชื่อ</button>
+          <button class="btn btn-outline" onclick="refreshPage('loans')">↻ รีเฟรช</button>
+        </div>
+      </div>
+      <div class="card"><div style="padding:0">
+        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th>ราคาทุน</th><th>กำไร</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments">
+      <div class="page-bar">
+        <span style="font-size:14px;color:var(--g5)">ประวัติการชำระ</span>
+        <div class="btn-grp no-print">
+          <button class="btn btn-primary" onclick="openModal('mo-pay')">+ บันทึกรับชำระ</button>
+          <button class="btn btn-outline" onclick="refreshPage('payments')">↻ รีเฟรช</button>
+        </div>
+      </div>
+      <div class="card"><div style="padding:0">
+        <table class="tbl"><thead><tr><th>วันที่</th><th>สมาชิก</th><th>รหัสสัญญา</th><th>งวดที่</th><th>จำนวนเงิน</th><th>หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="payments-tbody"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- CASHFLOW -->
+    <div class="page" id="page-cashflow">
+      <div class="page-bar">
+        <span style="font-size:14px;color:var(--g5)">รายรับ-รายจ่าย</span>
+        <div class="btn-grp no-print">
+          <button class="btn btn-primary" onclick="openCfForm()">+ บันทึกรายการ</button>
+          <button class="btn btn-outline" onclick="refreshPage('cashflow')">↻ รีเฟรช</button>
+        </div>
+      </div>
+      <div class="card"><div style="padding:0">
+        <table class="tbl" id="cf-table"><thead><tr><th>วันที่</th><th>รายการ</th><th>ประเภท</th><th>รายรับ</th><th>รายจ่าย</th><th>คงเหลือ</th><th class="no-print">จัดการ</th></tr></thead><tbody></tbody></table>
+      </div></div>
+      <div class="cf-sum" id="cf-sum" style="display:none"><div style="font-size:13px;color:var(--teal);font-weight:500" id="cf-sum-txt"></div><div style="font-size:22px;font-weight:700;color:var(--teal-d);font-family:var(--mono)" id="cf-sum-val"></div></div>
+    </div>
+
+    <!-- NPL -->
+    <div class="page" id="page-npl">
+      <div id="npl-alert" class="alert alert-danger" style="display:none"></div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">หนี้ค้างเกิน 1 ปี</span>
+          <div class="btn-grp no-print"><button class="btn btn-primary btn-sm" onclick="openNplForm()">+ เพิ่มรายการ</button><button class="btn btn-outline btn-sm" onclick="refreshPage('npl')">↻</button></div>
+        </div>
+        <div style="padding:0"><table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์</th><th>คงค้าง</th><th>ประเภท</th><th>หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="npl-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- APPLY -->
+    <div class="page" id="page-apply">
+      <div class="card" style="max-width:720px">
+        <div class="card-header">
+          <span class="card-title">แบบฟอร์มขอสินเชื่อ Murabahah</span>
+          <div class="btn-grp no-print">
+            <button class="btn btn-primary" onclick="printApplyForm()">🖨 พิมพ์ A4</button>
+            <button class="btn btn-outline" onclick="saveApplyAsLoan()">💾 บันทึกสินเชื่อ</button>
+          </div>
+        </div>
+        <div style="padding:22px">
+          <div class="alert alert-info">ข้าพเจ้ายืนยันให้กลุ่มซื้อสินค้าในนามกลุ่มก่อน แล้วขายต่อในราคา Murabahah (บวกกำไร 16%) ชำระเป็นงวด ราคาคงที่ตลอดสัญญา ไม่มีดอกเบี้ย</div>
+          <div class="form-row">
+            <div class="form-group"><label>วันที่ยื่น</label><input type="date" class="form-control" id="app-date"></div>
+            <div class="form-group"><label>สมาชิก</label><select class="form-control" id="app-member" onchange="fillApplicant()"><option value="">-- เลือก --</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>ชื่อ-สกุล</label><input class="form-control" id="app-name" readonly></div>
+            <div class="form-group"><label>ที่อยู่</label><input class="form-control" id="app-addr" readonly></div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--g1);margin:14px 0">
+          <div class="form-row">
+            <div class="form-group"><label>ประเภทสินค้า</label><select class="form-control" id="app-type"><option>เครื่องใช้ไฟฟ้า</option><option>โทรศัพท์มือถือ</option><option>เฟอร์นิเจอร์</option><option>อุปกรณ์การเกษตร</option><option>วัสดุซ่อมบ้าน</option><option>อื่นๆ</option></select></div>
+            <div class="form-group"><label>ชื่อสินค้า/รุ่น</label><input class="form-control" id="app-item" placeholder="เช่น ตู้เย็น Samsung 2 ประตู"></div>
+          </div>
+          <div class="fg fg3" style="margin-bottom:14px">
+            <div class="form-group"><label>ราคาทุน (บาท)</label><input class="form-control" type="number" id="app-cost" oninput="calcApp()"></div>
+            <div class="form-group">
+              <label>กำไร % <span style="font-size:11px;color:var(--g5);font-weight:400">(ปรับได้)</span></label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input class="form-control" type="number" id="app-rate" value="16" min="1" max="100" step="0.5" oninput="calcApp()" style="width:80px;flex-shrink:0">
+                <span style="font-size:13px;color:var(--g5)">%</span>
+                <input class="form-control" id="app-profit" readonly style="background:var(--g0);color:var(--amber);font-weight:600">
+              </div>
+            </div>
+            <div class="form-group"><label>ราคาขายรวม</label><input class="form-control" id="app-total" readonly style="background:var(--teal-l);font-weight:700;color:var(--teal-d)"></div>
+          </div>
+          <div class="fg fg3" style="margin-bottom:14px">
+            <div class="form-group"><label>จำนวนงวด</label><select class="form-control" id="app-inst" onchange="calcApp()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="10">10</option><option value="12" selected>12</option></select></div>
+            <div class="form-group"><label>งวดละ (บาท)</label><input class="form-control" id="app-monthly" readonly style="font-weight:700"></div>
+            <div class="form-group"><label>ผู้ค้ำประกัน</label><input class="form-control" id="app-guarantor"></div>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--g1);margin:14px 0">
+          <div style="font-size:12px;font-weight:700;color:var(--teal-d);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">ตัวอย่างตารางชำระ</div>
+          <div style="overflow-x:auto"><table class="tbl" id="app-preview" style="min-width:580px"><thead><tr><th>งวดที่</th><th>กำหนดชำระ</th><th>จำนวนเงิน (บาท)</th><th>คงเหลือ (บาท)</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Member -->
+<div class="mo" id="mo-member">
+  <div class="mo-box">
+    <div class="mo-hd"><span class="mo-title" id="mo-member-title">เพิ่มสมาชิก</span><button class="mo-close" onclick="closeModal('mo-member')">×</button></div>
+    <div class="mo-body">
+      <input type="hidden" id="edit-member-id">
+      <div class="form-row"><div class="form-group"><label>รหัสสมาชิก *</label><input class="form-control" id="fm-id" placeholder="P-000XX"></div><div class="form-group"><label>วันที่เข้า</label><input type="date" class="form-control" id="fm-date"></div></div>
+      <div class="form-group" style="margin-bottom:14px"><label>ชื่อ-สกุล *</label><input class="form-control" id="fm-name"></div>
+      <div class="form-group" style="margin-bottom:14px"><label>ที่อยู่</label><input class="form-control" id="fm-addr"></div>
+      <div class="form-row"><div class="form-group"><label>เบอร์โทร</label><input class="form-control" id="fm-phone"></div><div class="form-group"><label>ค่าหุ้น (บาท)</label><input type="number" class="form-control" id="fm-share"></div></div>
+    </div>
+    <div class="mo-ft"><button class="btn btn-outline" onclick="closeModal('mo-member')">ยกเลิก</button><button class="btn btn-primary" onclick="saveMember()" id="save-member-btn">💾 บันทึก</button></div>
+  </div>
+</div>
+
+<!-- Loan -->
+<div class="mo" id="mo-loan">
+  <div class="mo-box">
+    <div class="mo-hd"><span class="mo-title" id="mo-loan-title">เพิ่มสินเชื่อ</span><button class="mo-close" onclick="closeModal('mo-loan')">×</button></div>
+    <div class="mo-body">
+      <input type="hidden" id="edit-loan-id">
+      <div class="form-row"><div class="form-group"><label>สมาชิก *</label><select class="form-control" id="fl-member"><option value="">-- เลือก --</option></select></div><div class="form-group"><label>ประเภทสินค้า</label><select class="form-control" id="fl-type"><option>เครื่องใช้ไฟฟ้า</option><option>โทรศัพท์มือถือ</option><option>ทองรูปพรรณ</option><option>เฟอร์นิเจอร์</option><option>อุปกรณ์การเกษตร</option><option>วัสดุซ่อมบ้าน</option><option>อื่นๆ</option></select></div></div>
+      <div class="form-row"><div class="form-group"><label>ราคาทุน *</label><input type="number" class="form-control" id="fl-cost" oninput="calcLoanForm()"></div><div class="form-group">
+          <label>กำไร % <span style="font-size:11px;color:var(--g5);font-weight:400">(ปรับได้)</span></label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input class="form-control" type="number" id="fl-rate" value="16" min="1" max="100" step="0.5" oninput="calcLoanForm()" style="width:80px;flex-shrink:0">
+            <span style="font-size:13px;color:var(--g5)">%</span>
+            <input class="form-control" id="fl-total" readonly style="background:var(--teal-l);font-weight:700">
+          </div>
+        </div></div>
+      <div class="form-row"><div class="form-group"><label>งวด</label><select class="form-control" id="fl-inst" onchange="calcLoanForm()"><option value="3">3</option><option value="6">6</option><option value="9">9</option><option value="10">10</option><option value="12" selected>12</option></select></div><div class="form-group"><label>งวดละ (บาท)</label><input class="form-control" id="fl-monthly" readonly style="font-weight:700"></div></div>
+      <div class="form-row"><div class="form-group"><label>วันที่สัญญา</label><input type="date" class="form-control" id="fl-date"></div><div class="form-group"><label>สถานะ</label><select class="form-control" id="fl-status"><option value="active">กำลังผ่อน</option><option value="closed">ปิดแล้ว</option></select></div></div>
+      <div class="form-group"><label>หมายเหตุ</label><input class="form-control" id="fl-note"></div>
+    </div>
+    <div class="mo-ft"><button class="btn btn-outline" onclick="closeModal('mo-loan')">ยกเลิก</button><button class="btn btn-primary" onclick="saveLoan()" id="save-loan-btn">💾 บันทึก</button></div>
+  </div>
+</div>
+
+<!-- Loan Detail -->
+<div class="mo" id="mo-detail">
+  <div class="mo-box wide">
+    <div class="mo-hd"><span class="mo-title" id="mo-detail-title">รายละเอียดสินเชื่อ</span><button class="mo-close" onclick="closeModal('mo-detail')">×</button></div>
+    <div class="mo-body" id="mo-detail-body"></div>
+    <div class="mo-ft"><button class="btn btn-outline" onclick="closeModal('mo-detail')">ปิด</button></div>
+  </div>
+</div>
+
+<!-- Payment -->
+<div class="mo" id="mo-pay">
+  <div class="mo-box" style="width:460px">
+    <div class="mo-hd"><span class="mo-title">บันทึกรับชำระ</span><button class="mo-close" onclick="closeModal('mo-pay')">×</button></div>
+    <div class="mo-body">
+      <div class="form-group" style="margin-bottom:14px"><label>สัญญาสินเชื่อ *</label><select class="form-control" id="pay-loan" onchange="fillPayInfo()"><option value="">-- เลือกสัญญา --</option></select></div>
+      <div id="pay-info" style="background:var(--teal-l);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;display:none"></div>
+      <div class="form-row"><div class="form-group"><label>งวดที่ *</label><input type="number" class="form-control" id="pay-period" min="1"></div><div class="form-group"><label>จำนวนเงิน *</label><input type="number" class="form-control" id="pay-amount"></div></div>
+      <div class="form-row"><div class="form-group"><label>วันที่รับ *</label><input type="date" class="form-control" id="pay-date"></div><div class="form-group"><label>หมายเหตุ</label><input class="form-control" id="pay-note"></div></div>
+    </div>
+    <div class="mo-ft"><button class="btn btn-outline" onclick="closeModal('mo-pay')">ยกเลิก</button><button class="btn btn-primary" onclick="savePayment()" id="save-pay-btn">💾 บันทึก</button></div>
+  </div>
+</div>
+
+<!-- Cashflow -->
+<div class="mo" id="mo-cf">
+  <div class="mo-box" style="width:440px">
+    <div class="mo-hd"><span class="mo-title" id="mo-cf-title">บันทึกรายการ</span><button class="mo-close" onclick="closeModal('mo-cf')">×</button></div>
+    <div class="mo-body">
+      <input type="hidden" id="edit-cf-id">
+      <div class="form-group" style="margin-bottom:14px"><label>รายการ *</label><input class="form-control" id="cf-desc"></div>
+      <div class="form-row"><div class="form-group"><label>ประเภท</label><select class="form-control" id="cf-type"><option value="income">รายรับ</option><option value="expense">รายจ่าย</option></select></div><div class="form-group"><label>จำนวนเงิน *</label><input type="number" class="form-control" id="cf-amount"></div></div>
+      <div class="form-group"><label>วันที่</label><input type="date" class="form-control" id="cf-date"></div>
+    </div>
+    <div class="mo-ft"><button class="btn btn-outline" onclick="closeModal('mo-cf')">ยกเลิก</button><button class="btn btn-primary" onclick="saveCf()" id="save-cf-btn">💾 บันทึก</button></div>
+  </div>
+</div>
+
+<!-- NPL -->
+<div class="mo" id="mo-npl">
+  <div class="mo-box" style="width:480px">
+    <div class="mo-hd"><span class="mo-title" id="mo-npl-title">เพิ่มหนี้ค้าง</span><button class="mo-close" onclick="closeModal('mo-npl')">×</button></div>
+    <div class="mo-body">
+      <input type="hidden" id="edit-npl-id">
+      <div class="form-row"><div class="form-group"><label>รหัสสมาชิก</label><input class="form-control" id="nf-id"></div><div class="form-group"><label>เบอร์โทร</label><input class="form-control" id="nf-phone"></div></div>
+      <div class="form-group" style="margin-bottom:14px"><label>ชื่อ-สกุล *</label><input class="form-control" id="nf-name"></div>
+      <div class="form-row"><div class="form-group"><label>ยอดค้าง *</label><input type="number" class="form-control" id="nf-amt"></div><div class="form-group"><label>ประเภท</label><select class="form-control" id="nf-type"><option>ทองรูปพรรณ</option><option>เครื่องใช้ไฟฟ้า</option><option>โทรศัพท์มือถือ</option><option>วัสดุซ่อมบ้าน</option><option>อื่นๆ</option></select></div></div>
+      <div class="form-group"><label>หมายเหตุ</label><input class="form-control" id="nf-note"></div>
+    </div>
+    <div class="mo-ft"><button class="btn btn-outline" onclick="closeModal('mo-npl')">ยกเลิก</button><button class="btn btn-primary" onclick="saveNpl()" id="save-npl-btn">💾 บันทึก</button></div>
+  </div>
+</div>
+
+<!-- Confirm -->
+<div id="cdlg"><div id="cbox"><div id="cmsg"></div><div id="cacts"><button class="btn btn-outline" onclick="cResolve(false)">ยกเลิก</button><button class="btn btn-danger" id="cok" onclick="cResolve(true)">ยืนยัน</button></div></div></div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ========== CONFIG ==========
+let API_URL = '';
+let IS_ONLINE = false;
+let ADMIN = false;
+let cache = { members:[], loans:[], payments:[], cashflow:[], npl:[] };
+let currentPage = 'dashboard';
+
+const SHEET_NAMES = ['members','loans','payments','cashflow','npl'];
+const PAGE_TITLES = {dashboard:'ภาพรวม',members:'ทะเบียนสมาชิก',loans:'ข้อมูลสินเชื่อ',payments:'บันทึกชำระ',cashflow:'รายรับ-จ่าย',npl:'หนี้ค้าง / NPL',apply:'แบบขอสินเชื่อ'};
+
+// ========== SETUP ==========
+function connectSheet() {
+  const url = document.getElementById('setup-url-input').value.trim();
+  if (!url || !url.includes('script.google.com')) {
+    showSetupErr('URL ไม่ถูกต้อง กรุณาวาง URL จาก Apps Script');
+    return;
+  }
+  const btn = document.getElementById('connect-btn');
+  btn.innerHTML = '<span class="spinner"></span> กำลังทดสอบ...';
+  btn.disabled = true;
+  API_URL = url;
+  jsonpGet(url + '?sheet=members')
+    .then(data => {
+      IS_ONLINE = true;
+      localStorage.setItem('nahla_api_url', url);
+      document.getElementById('setup').style.display = 'none';
+      setSyncStatus('ok', 'เชื่อมต่อแล้ว');
+      document.getElementById('db-mode-label').textContent = 'Google Sheets ☁';
+      syncAll();
+      const count = Array.isArray(data) ? data.length : 0;
+      showToast('เชื่อมต่อสำเร็จ ✓ พบข้อมูล ' + count + ' รายการ');
+    })
+    .catch(err => {
+      API_URL = '';
+      btn.innerHTML = 'เชื่อมต่อ Google Sheets';
+      btn.disabled = false;
+      showSetupErr('เชื่อมต่อไม่ได้ — ดูวิธีแก้ด้านล่าง');
+    });
+}
+
+function useLocalMode() {
+  IS_ONLINE = false;
+  document.getElementById('setup').style.display = 'none';
+  setSyncStatus('err', 'ออฟไลน์ (localStorage)');
+  document.getElementById('db-mode-label').textContent = 'ออฟไลน์ (Local)';
+  loadLocalSeed();
+  renderDashboard();
+  showToast('ใช้งานแบบออฟไลน์ — ข้อมูลบันทึกในเครื่องนี้เท่านั้น');
+}
+
+function showSetupErr(msg) {
+  const el = document.getElementById('setup-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Check saved URL
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('nahla_api_url');
+  if (saved) {
+    document.getElementById('setup-url-input').value = saved;
+    API_URL = saved;
+    document.getElementById('connect-btn').textContent = 'เชื่อมต่อ (URL ที่บันทึกไว้)';
+  }
+  // Set default dates
+  document.querySelectorAll('input[type=date]').forEach(el => { if (!el.value) el.value = today(); });
+  updateClock();
+  setInterval(updateClock, 30000);
+});
+
+// ========== API — ใช้ JSONP แก้ปัญหา CORS ของ Google Apps Script ==========
+
+// JSONP GET: ส่ง ?callback=xxx ให้ Apps Script ตอบกลับเป็น xxx({...})
+function jsonpGet(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('JSONP timeout'));
+    }, 15000);
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function(data) { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error('JSONP script error')); };
+    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName + '&_t=' + Date.now();
+    document.head.appendChild(script);
+  });
+}
+
+// POST ผ่าน fetch (Google Apps Script ยอมรับ POST จาก browser ได้ถ้า redirect follow)
+async function jsonpPost(url, payload) {
+  const r = await fetch(url, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain' }, // ใช้ text/plain หลีกเลี่ยง preflight CORS
+    body: JSON.stringify(payload)
+  });
+  const text = await r.text();
+  try { return JSON.parse(text); }
+  catch { return { status: 'ok', raw: text }; }
+}
+
+async function apiGet(sheet) {
+  if (!IS_ONLINE) return JSON.parse(localStorage.getItem('nahla_' + sheet) || '[]');
+  try {
+    const data = await jsonpGet(API_URL + '?sheet=' + sheet);
+    cache[sheet] = Array.isArray(data) ? data : [];
+    return cache[sheet];
+  } catch(e) {
+    console.error('apiGet error', sheet, e);
+    throw e;
+  }
+}
+
+async function apiPost(sheet, action, data, id) {
+  if (!IS_ONLINE) {
+    let list = JSON.parse(localStorage.getItem('nahla_' + sheet) || '[]');
+    if (action === 'add') { list.push(data); }
+    else if (action === 'update') { const i = list.findIndex(r => r.id === id); if (i > -1) list[i] = {...list[i], ...data}; }
+    else if (action === 'delete') { list = list.filter(r => r.id !== id); }
+    localStorage.setItem('nahla_' + sheet, JSON.stringify(list));
+    cache[sheet] = list;
+    return { status: 'ok', id };
+  }
+  setSyncStatus('syncing', 'กำลังบันทึก...');
+  try {
+    const result = await jsonpPost(API_URL, { sheet, action, data, id });
+    setSyncStatus('ok', 'บันทึกแล้ว ' + new Date().toLocaleTimeString('th-TH'));
+    cache[sheet] = await apiGet(sheet);
+    return result;
+  } catch(e) {
+    setSyncStatus('err', 'บันทึกไม่สำเร็จ');
+    throw e;
+  }
+}
+
+async function syncAll() {
+  setSyncStatus('syncing', 'กำลัง Sync...');
+  try {
+    for (const sheet of SHEET_NAMES) {
+      cache[sheet] = await apiGet(sheet);
+    }
+    setSyncStatus('ok', 'Sync แล้ว ' + new Date().toLocaleTimeString('th-TH'));
+    renderPage(currentPage);
+    populateMemberDDs();
+    populateLoanDDs();
+    showToast('Sync สำเร็จ ✓');
+  } catch (e) {
+    setSyncStatus('err', 'Sync ไม่สำเร็จ');
+    showToast('ไม่สามารถ Sync ได้ ตรวจสอบการเชื่อมต่อ', 'err');
+  }
+}
+
+async function refreshPage(sheet) {
+  setSyncStatus('syncing', 'กำลังโหลด...');
+  try {
+    cache[sheet] = await apiGet(sheet);
+    setSyncStatus('ok', 'โหลดแล้ว');
+    renderPage(currentPage);
+  } catch (e) {
+    setSyncStatus('err', 'โหลดไม่สำเร็จ');
+  }
+}
+
+// ========== SYNC STATUS ==========
+function setSyncStatus(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
+}
+
+// ========== ADMIN ==========
+function toggleAdmin() {
+  if (!ADMIN) {
+    const pw = prompt('รหัสผ่าน Admin:');
+    if (pw !== 'nahla2565') { showToast('รหัสผ่านไม่ถูกต้อง', 'err'); return; }
+  }
+  ADMIN = !ADMIN;
+  document.getElementById('admin-bar').classList.toggle('on', ADMIN);
+  document.getElementById('admin-chip').style.display = ADMIN ? '' : 'none';
+  document.getElementById('admin-btn').textContent = ADMIN ? '🔓 Admin ON' : '🔐 Admin Mode';
+  renderPage(currentPage);
+  showToast(ADMIN ? 'เข้าสู่ Admin Mode ✓' : 'ออกจาก Admin Mode');
+}
+
+// ========== NAV ==========
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    const pg = el.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    document.getElementById('page-' + pg).classList.add('active');
+    document.getElementById('page-title').textContent = PAGE_TITLES[pg] || pg;
+    currentPage = pg;
+    renderPage(pg);
+  });
+});
+
+function renderPage(pg) {
+  const map = {dashboard: renderDashboard, members: renderMembers, loans: renderLoans, payments: renderPayments, cashflow: renderCashflow, npl: renderNpl, apply: initApply};
+  if (map[pg]) map[pg]();
+}
+
+// ========== MODAL ==========
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(el => el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); }));
+
+// ========== CONFIRM ==========
+let _cRes = null;
+function confirm2(msg, okLabel = 'ยืนยัน') {
+  return new Promise(res => {
+    _cRes = res;
+    document.getElementById('cmsg').textContent = msg;
+    document.getElementById('cok').textContent = okLabel;
+    document.getElementById('cdlg').classList.add('open');
+  });
+}
+function cResolve(v) { _cRes && _cRes(v); document.getElementById('cdlg').classList.remove('open'); }
+
+// ========== TOAST ==========
+let _tt;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  clearTimeout(_tt);
+  t.textContent = msg;
+  t.className = 'show' + (type === 'err' ? ' err' : '');
+  _tt = setTimeout(() => t.className = '', 3000);
+}
+
+// ========== UTILS ==========
+const fmt = n => Number(n || 0).toLocaleString('th-TH');
+const today = () => new Date().toISOString().slice(0, 10);
+function genId(prefix, list) { return prefix + '-' + String(list.length + 1).padStart(4, '0') + '-' + Date.now().toString().slice(-3); }
+function thDate(s) { if (!s) return '—'; const d = new Date(s); d.setDate(d.getDate()+1); return d.toLocaleDateString('th-TH', {year:'numeric',month:'long',day:'numeric'}); }
+function setBtn(id, loading) { const b = document.getElementById(id); if (!b) return; b.disabled = loading; b.innerHTML = loading ? '<span class="spinner"></span> กำลังบันทึก...' : '💾 บันทึก'; }
+
+// ========== DASHBOARD ==========
+function renderDashboard() {
+  const loans = cache.loans || [];
+  const npl = cache.npl || [];
+  const cf = cache.cashflow || [];
+  const members = cache.members || [];
+  const balance = cf.length ? Number(cf[cf.length - 1].balance) : 0;
+  const active = loans.filter(l => l.status === 'active');
+  const totalOut = active.reduce((s, l) => s + Number(l.remaining || 0), 0);
+  const totalNpl = npl.reduce((s, n) => s + Number(n.outstanding || 0), 0);
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-card stat-teal"><div class="stat-lbl">ยอดเงินในบัญชี</div><div class="stat-val">${fmt(balance)}</div><div class="stat-sub">บาท</div></div>
+    <div class="stat-card stat-green"><div class="stat-lbl">สินเชื่อคงค้าง</div><div class="stat-val">${fmt(totalOut)}</div><div class="stat-sub">${active.length} สัญญา</div></div>
+    <div class="stat-card stat-amber"><div class="stat-lbl">หนี้ค้างเกิน 1 ปี</div><div class="stat-val">${fmt(totalNpl)}</div><div class="stat-sub">${npl.filter(n => Number(n.outstanding) > 0).length} ราย</div></div>
+    <div class="stat-card"><div class="stat-lbl">สมาชิก</div><div class="stat-val">${members.length}</div><div class="stat-sub">คน</div></div>`;
+  document.getElementById('dash-loans').innerHTML = active.length ? active.map(l => `<tr><td style="font-weight:500">${l.memberName}</td><td class="mono" style="color:var(--red);font-weight:600">${fmt(l.remaining)}</td><td><span class="badge b-info">ผ่อนอยู่</span></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;color:var(--g5);padding:16px">ไม่มีสินเชื่อที่กำลังผ่อน</td></tr>';
+  document.getElementById('dash-npl').innerHTML = npl.filter(n => Number(n.outstanding) > 0).map(n => `<tr><td style="font-weight:500">${n.name}</td><td class="mono" style="color:var(--red);font-weight:600">${fmt(n.outstanding)}</td><td><span class="badge b-warn">${n.type}</span></td></tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--g5);padding:16px">ไม่มีหนี้ค้าง</td></tr>';
+}
+
+// ========== MEMBERS ==========
+function renderMembers() {
+  const q = (document.getElementById('srch-member') || {}).value || '';
+  const list = (cache.members || []).filter(m => !q || m.name.includes(q) || m.id.includes(q));
+  document.getElementById('members-tbody').innerHTML = list.length ? list.map(m => `
+    <tr>
+      <td class="mono">${m.id}</td><td style="font-weight:500">${m.name}</td>
+      <td style="font-size:12px">${m.phone || '—'}</td>
+      <td style="font-size:12px;color:var(--g5)">${m.addr || '—'}</td>
+      <td style="font-size:12px">${m.joined || '—'}</td>
+      <td class="mono">${fmt(m.share)}</td>
+      <td class="no-print"><div class="btn-grp">
+        <button class="btn btn-outline btn-xs" onclick='editMember("${m.id}")'>✏ แก้ไข</button>
+        ${ADMIN ? `<button class="btn btn-danger btn-xs" onclick='delMember("${m.id}")'>🗑</button>` : ''}
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">ไม่มีข้อมูลสมาชิก</td></tr>';
+}
+
+function openMemberForm() {
+  document.getElementById('mo-member-title').textContent = 'เพิ่มสมาชิกใหม่';
+  document.getElementById('edit-member-id').value = '';
+  ['fm-id','fm-name','fm-addr','fm-phone'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fm-share').value = '';
+  document.getElementById('fm-date').value = today();
+  openModal('mo-member');
+}
+
+function editMember(id) {
+  const m = (cache.members || []).find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('mo-member-title').textContent = 'แก้ไขสมาชิก';
+  document.getElementById('edit-member-id').value = id;
+  document.getElementById('fm-id').value = m.id;
+  document.getElementById('fm-name').value = m.name;
+  document.getElementById('fm-addr').value = m.addr || '';
+  document.getElementById('fm-phone').value = m.phone || '';
+  document.getElementById('fm-date').value = m.joined || '';
+  document.getElementById('fm-share').value = m.share || '';
+  openModal('mo-member');
+}
+
+async function saveMember() {
+  const origId = document.getElementById('edit-member-id').value;
+  const id = document.getElementById('fm-id').value.trim();
+  const name = document.getElementById('fm-name').value.trim();
+  if (!id || !name) { showToast('กรุณากรอก รหัส และ ชื่อ-สกุล', 'err'); return; }
+  const data = { id, name, addr: document.getElementById('fm-addr').value, phone: document.getElementById('fm-phone').value, joined: document.getElementById('fm-date').value, share: Number(document.getElementById('fm-share').value) || 0 };
+  setBtn('save-member-btn', true);
+  try {
+    if (origId) {
+      await apiPost('members', 'update', data, origId);
+      showToast('แก้ไขสมาชิกแล้ว ✓');
+    } else {
+      if ((cache.members || []).find(m => m.id === id)) { showToast('รหัสนี้มีอยู่แล้ว', 'err'); setBtn('save-member-btn', false); return; }
+      await apiPost('members', 'add', data);
+      showToast('เพิ่มสมาชิกแล้ว ✓');
+    }
+    closeModal('mo-member');
+    cache.members = await apiGet('members');
+    renderMembers(); populateMemberDDs();
+  } catch (e) { showToast('บันทึกไม่สำเร็จ: ' + e.message, 'err'); }
+  setBtn('save-member-btn', false);
+}
+
+async function delMember(id) {
+  if (!ADMIN) { showToast('ต้องอยู่ใน Admin Mode', 'err'); return; }
+  const ok = await confirm2('ลบสมาชิก "' + id + '" ออกจากระบบ?');
+  if (!ok) return;
+  await apiPost('members', 'delete', null, id);
+  cache.members = await apiGet('members');
+  renderMembers(); populateMemberDDs();
+  showToast('ลบสมาชิกแล้ว');
+}
+
+// ========== LOANS ==========
+function renderLoans() {
+  const q = (document.getElementById('srch-loan') || {}).value || '';
+  const list = (cache.loans || []).filter(l => !q || l.memberName.includes(q) || l.id.includes(q));
+  document.getElementById('loans-tbody').innerHTML = list.length ? list.map(l => `
+    <tr>
+      <td class="mono" style="font-weight:600;color:var(--teal)">${l.id}</td>
+      <td style="font-weight:500">${l.memberName}</td>
+      <td class="mono">${fmt(l.cost)}</td>
+      <td class="mono" style="color:var(--amber)">${fmt(l.profit)}</td>
+      <td class="mono" style="font-weight:700;color:var(--teal-d)">${fmt(l.total)}</td>
+      <td>${l.installments}</td>
+      <td class="mono" style="color:${Number(l.remaining)>0?'var(--red)':'var(--green)'};font-weight:600">${fmt(l.remaining)}</td>
+      <td><span class="badge b-warn">${l.type}</span></td>
+      <td><span class="badge ${l.status==='active'?'b-info':'b-ok'}">${l.status==='active'?'กำลังผ่อน':'ปิดแล้ว'}</span></td>
+      <td class="no-print"><div class="btn-grp">
+        <button class="btn btn-outline btn-xs" onclick='showLoanDetail("${l.id}")'>ดู</button>
+        <button class="btn btn-purple btn-xs" onclick='printLoan("${l.id}")'>🖨</button>
+        ${ADMIN ? `<button class="btn btn-warn btn-xs" onclick='editLoan("${l.id}")'>✏</button><button class="btn btn-danger btn-xs" onclick='delLoan("${l.id}")'>🗑</button>` : ''}
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">ไม่มีข้อมูลสินเชื่อ</td></tr>';
+}
+
+function openLoanForm() {
+  document.getElementById('mo-loan-title').textContent = 'เพิ่มสินเชื่อใหม่';
+  document.getElementById('edit-loan-id').value = '';
+  ['fl-cost','fl-total','fl-monthly','fl-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fl-rate').value = '16';
+  document.getElementById('fl-date').value = today();
+  document.getElementById('fl-status').value = 'active';
+  openModal('mo-loan');
+}
+
+function editLoan(id) {
+  const l = (cache.loans || []).find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('mo-loan-title').textContent = 'แก้ไขสินเชื่อ ' + id;
+  document.getElementById('edit-loan-id').value = id;
+  document.getElementById('fl-member').value = l.memberId;
+  document.getElementById('fl-type').value = l.type;
+  document.getElementById('fl-cost').value = l.cost;
+  document.getElementById('fl-rate').value = l.rate || 16;
+  document.getElementById('fl-inst').value = l.installments;
+  document.getElementById('fl-date').value = l.date || '';
+  document.getElementById('fl-status').value = l.status;
+  document.getElementById('fl-note').value = l.note || '';
+  calcLoanForm();
+  openModal('mo-loan');
+}
+
+function calcLoanForm() {
+  const cost = Number(document.getElementById('fl-cost').value) || 0;
+  const rate = (Number(document.getElementById('fl-rate').value) || 16) / 100;
+  const total = Math.round(cost * (1 + rate));
+  const inst = Number(document.getElementById('fl-inst').value) || 12;
+  document.getElementById('fl-total').value = total ? fmt(total) : '';
+  document.getElementById('fl-monthly').value = total ? fmt(Math.ceil(total / inst)) : '';
+}
+
+async function saveLoan() {
+  const origId = document.getElementById('edit-loan-id').value;
+  const memberId = document.getElementById('fl-member').value;
+  const member = (cache.members || []).find(m => m.id === memberId);
+  if (!member) { showToast('กรุณาเลือกสมาชิก', 'err'); return; }
+  const cost = Number(document.getElementById('fl-cost').value);
+  if (!cost) { showToast('กรุณากรอกราคาทุน', 'err'); return; }
+  const rate = (Number(document.getElementById('fl-rate').value) || 16) / 100;
+  const profit = Math.round(cost * rate), total = cost + profit;
+  const inst = Number(document.getElementById('fl-inst').value);
+  const monthly = Math.ceil(total / inst);
+  const data = { memberId, memberName: member.name, type: document.getElementById('fl-type').value, cost, profit, total, rate: Number(document.getElementById('fl-rate').value)||16, installments: inst, monthly, date: document.getElementById('fl-date').value, status: document.getElementById('fl-status').value, note: document.getElementById('fl-note').value };
+  setBtn('save-loan-btn', true);
+  try {
+    if (origId) {
+      await apiPost('loans', 'update', data, origId);
+      showToast('แก้ไขสินเชื่อแล้ว ✓');
+    } else {
+      data.id = genId('L', cache.loans || []);
+      data.remaining = total;
+      await apiPost('loans', 'add', data);
+      showToast('เพิ่มสินเชื่อแล้ว ✓');
+    }
+    closeModal('mo-loan');
+    cache.loans = await apiGet('loans');
+    renderLoans(); populateLoanDDs();
+  } catch (e) { showToast('บันทึกไม่สำเร็จ', 'err'); }
+  setBtn('save-loan-btn', false);
+}
+
+async function delLoan(id) {
+  if (!ADMIN) { showToast('ต้องอยู่ใน Admin Mode', 'err'); return; }
+  const ok = await confirm2('ลบสัญญา "' + id + '"?');
+  if (!ok) return;
+  await apiPost('loans', 'delete', null, id);
+  cache.loans = await apiGet('loans');
+  renderLoans(); populateLoanDDs();
+  showToast('ลบสัญญาแล้ว');
+}
+
+function showLoanDetail(id) {
+  const loan = (cache.loans || []).find(l => l.id === id);
+  if (!loan) return;
+  const payments = (cache.payments || []).filter(p => p.loanId === id);
+  const pct = Math.min(100, Math.round(((Number(loan.total) - Number(loan.remaining)) / Number(loan.total)) * 100));
+  document.getElementById('mo-detail-title').textContent = loan.id + ' — ' + loan.memberName;
+  document.getElementById('mo-detail-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <div style="background:var(--teal-l);padding:14px;border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--teal);font-weight:600">ราคาขาย</div><div style="font-size:20px;font-weight:700;color:var(--teal-d);font-family:var(--mono)">${fmt(loan.total)}</div></div>
+      <div style="background:var(--amber-l);padding:14px;border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--amber);font-weight:600">คงค้าง</div><div style="font-size:20px;font-weight:700;color:var(--amber);font-family:var(--mono)">${fmt(loan.remaining)}</div></div>
+      <div style="background:var(--green-l);padding:14px;border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--green);font-weight:600">ชำระแล้ว</div><div style="font-size:20px;font-weight:700;color:var(--green);font-family:var(--mono)">${fmt(Number(loan.total) - Number(loan.remaining))}</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--g5);margin-bottom:4px">ความคืบหน้า ${pct}%</div>
+    <div class="prog" style="margin-bottom:16px"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">ประวัติชำระ (${payments.length} งวด)</div>
+    ${payments.length ? `<table class="tbl"><thead><tr><th>วันที่</th><th>งวดที่</th><th>จำนวน</th><th>หมายเหตุ</th>${ADMIN ? '<th>ลบ</th>' : ''}</tr></thead><tbody>${payments.map(p => `<tr><td style="font-size:12px">${p.date}</td><td style="text-align:center">${p.period}</td><td class="mono" style="color:var(--green);font-weight:600">${fmt(p.amount)}</td><td style="color:var(--g5)">${p.note || '—'}</td>${ADMIN ? `<td><button class="btn btn-danger btn-xs" onclick="delPaymentItem('${p.id}','${id}')">🗑</button></td>` : ''}</tr>`).join('')}</tbody></table>` : '<div style="color:var(--g3);padding:12px 0;font-size:13px">ยังไม่มีประวัติชำระ</div>'}
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-purple btn-sm" onclick='printLoan("${id}");closeModal("mo-detail")'>🖨 พิมพ์ A4</button>
+      ${loan.status === 'active' ? `<button class="btn btn-danger btn-sm" onclick='closeLoan("${id}")'>ปิดบัญชี</button>` : '<span class="badge b-ok">ปิดบัญชีแล้ว</span>'}
+    </div>`;
+  openModal('mo-detail');
+}
+
+async function delPaymentItem(payId, loanId) {
+  if (!ADMIN) return;
+  const ok = await confirm2('ลบรายการชำระนี้?');
+  if (!ok) return;
+  const p = (cache.payments || []).find(x => x.id === payId);
+  if (p) {
+    const loans = cache.loans || [];
+    const loan = loans.find(l => l.id === loanId);
+    if (loan) { await apiPost('loans', 'update', { remaining: Number(loan.remaining) + Number(p.amount), status: 'active' }, loanId); }
+    await apiPost('payments', 'delete', null, payId);
+    cache.payments = await apiGet('payments');
+    cache.loans = await apiGet('loans');
+  }
+  showLoanDetail(loanId);
+  showToast('ลบการชำระแล้ว');
+}
+
+async function closeLoan(id) {
+  const ok = await confirm2('ปิดบัญชีสินเชื่อ ' + id + '?', 'ปิดบัญชี');
+  if (!ok) return;
+  await apiPost('loans', 'update', { status: 'closed', remaining: 0 }, id);
+  cache.loans = await apiGet('loans');
+  closeModal('mo-detail');
+  renderLoans();
+  showToast('ปิดบัญชีแล้ว ✓');
+}
+
+// ========== PAYMENTS ==========
+function renderPayments() {
+  const list = (cache.payments || []).slice().reverse();
+  document.getElementById('payments-tbody').innerHTML = list.length ? list.map(p => `
+    <tr>
+      <td style="font-size:12px">${p.date}</td>
+      <td style="font-weight:500">${p.memberName}</td>
+      <td class="mono">${p.loanId}</td>
+      <td style="text-align:center">${p.period}</td>
+      <td class="mono" style="color:var(--green);font-weight:600">${fmt(p.amount)}</td>
+      <td style="color:var(--g5)">${p.note || '—'}</td>
+      <td class="no-print">${ADMIN ? `<button class="btn btn-danger btn-xs" onclick="delPayment('${p.id}')">🗑</button>` : '—'}</td>
+    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--g5)">ยังไม่มีรายการชำระ</td></tr>';
+}
+
+function fillPayInfo() {
+  const id = document.getElementById('pay-loan').value;
+  const loan = (cache.loans || []).find(l => l.id === id);
+  const box = document.getElementById('pay-info');
+  if (loan) {
+    const paid = (cache.payments || []).filter(p => p.loanId === id);
+    box.style.display = 'block';
+    box.innerHTML = `<strong>${loan.memberName}</strong> · งวดละ <strong class="mono">${fmt(loan.monthly)} บาท</strong> · คงค้าง <strong class="mono" style="color:var(--red)">${fmt(loan.remaining)} บาท</strong> · ชำระแล้ว ${paid.length} งวด`;
+    document.getElementById('pay-amount').value = loan.monthly;
+    document.getElementById('pay-period').value = paid.length + 1;
+  } else box.style.display = 'none';
+}
+
+async function savePayment() {
+  const loanId = document.getElementById('pay-loan').value;
+  const loan = (cache.loans || []).find(l => l.id === loanId);
+  if (!loan) { showToast('กรุณาเลือกสัญญา', 'err'); return; }
+  const amount = Number(document.getElementById('pay-amount').value);
+  const period = Number(document.getElementById('pay-period').value);
+  const date = document.getElementById('pay-date').value;
+  if (!amount || !period || !date) { showToast('กรุณากรอกข้อมูลให้ครบ', 'err'); return; }
+  setBtn('save-pay-btn', true);
+  try {
+    const newRemaining = Math.max(0, Number(loan.remaining) - amount);
+    const payData = { id: genId('P', cache.payments || []), loanId, memberName: loan.memberName, amount, period, date, note: document.getElementById('pay-note').value };
+    await apiPost('payments', 'add', payData);
+    await apiPost('loans', 'update', { remaining: newRemaining, status: newRemaining === 0 ? 'closed' : 'active' }, loanId);
+    // Update cashflow
+    const cf = cache.cashflow || [];
+    const lastBal = cf.length ? Number(cf[cf.length - 1].balance) : 0;
+    await apiPost('cashflow', 'add', { id: genId('CF', cf), date, desc: `ค่างวด ${loan.memberName} งวดที่ ${period}`, type: 'income', amount, balance: lastBal + amount });
+    cache.payments = await apiGet('payments');
+    cache.loans = await apiGet('loans');
+    cache.cashflow = await apiGet('cashflow');
+    closeModal('mo-pay');
+    renderPayments();
+    showToast('บันทึกการชำระแล้ว ✓');
+  } catch (e) { showToast('บันทึกไม่สำเร็จ', 'err'); }
+  setBtn('save-pay-btn', false);
+}
+
+async function delPayment(id) {
+  if (!ADMIN) { showToast('ต้องอยู่ใน Admin Mode', 'err'); return; }
+  const ok = await confirm2('ลบรายการชำระนี้?');
+  if (!ok) return;
+  const p = (cache.payments || []).find(x => x.id === id);
+  if (p) {
+    const loan = (cache.loans || []).find(l => l.id === p.loanId);
+    if (loan) await apiPost('loans', 'update', { remaining: Number(loan.remaining) + Number(p.amount), status: 'active' }, p.loanId);
+    await apiPost('payments', 'delete', null, id);
+    cache.payments = await apiGet('payments');
+    cache.loans = await apiGet('loans');
+  }
+  renderPayments();
+  showToast('ลบรายการแล้ว');
+}
+
+// ========== CASHFLOW ==========
+function renderCashflow() {
+  const cf = cache.cashflow || [];
+  let ti = 0, te = 0;
+  document.querySelector('#cf-table tbody').innerHTML = cf.length ? cf.map(r => {
+    if (r.type === 'income') ti += Number(r.amount); else te += Number(r.amount);
+    return `<tr>
+      <td style="font-size:12px">${r.date}</td><td>${r.desc}</td>
+      <td><span class="badge ${r.type === 'income' ? 'b-ok' : 'b-danger'}">${r.type === 'income' ? 'รายรับ' : 'รายจ่าย'}</span></td>
+      <td class="mono" style="color:var(--green)">${r.type === 'income' ? fmt(r.amount) : '—'}</td>
+      <td class="mono" style="color:var(--red)">${r.type === 'expense' ? fmt(r.amount) : '—'}</td>
+      <td class="mono" style="font-weight:700">${fmt(r.balance)}</td>
+      <td class="no-print">${ADMIN ? `<div class="btn-grp"><button class="btn btn-warn btn-xs" onclick="editCf('${r.id}')">✏</button><button class="btn btn-danger btn-xs" onclick="delCf('${r.id}')">🗑</button></div>` : '—'}</td>
+    </tr>`;}).join('') : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--g5)">ยังไม่มีรายการ</td></tr>';
+  const sum = document.getElementById('cf-sum');
+  sum.style.display = cf.length ? '' : 'none';
+  document.getElementById('cf-sum-txt').innerHTML = `รายรับ <strong class="mono">${fmt(ti)}</strong> · รายจ่าย <strong class="mono" style="color:var(--red)">${fmt(te)}</strong>`;
+  document.getElementById('cf-sum-val').textContent = fmt(cf.length ? cf[cf.length - 1].balance : 0) + ' บาท';
+}
+
+function openCfForm() {
+  document.getElementById('mo-cf-title').textContent = 'บันทึกรายการใหม่';
+  document.getElementById('edit-cf-id').value = '';
+  document.getElementById('cf-desc').value = '';
+  document.getElementById('cf-amount').value = '';
+  document.getElementById('cf-date').value = today();
+  document.getElementById('cf-type').value = 'income';
+  openModal('mo-cf');
+}
+
+function editCf(id) {
+  const r = (cache.cashflow || []).find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('mo-cf-title').textContent = 'แก้ไขรายการ';
+  document.getElementById('edit-cf-id').value = id;
+  document.getElementById('cf-desc').value = r.desc;
+  document.getElementById('cf-amount').value = r.amount;
+  document.getElementById('cf-date').value = r.date;
+  document.getElementById('cf-type').value = r.type;
+  openModal('mo-cf');
+}
+
+async function saveCf() {
+  const desc = document.getElementById('cf-desc').value.trim();
+  const amount = Number(document.getElementById('cf-amount').value);
+  const date = document.getElementById('cf-date').value;
+  const type = document.getElementById('cf-type').value;
+  if (!desc || !amount || !date) { showToast('กรุณากรอกข้อมูลให้ครบ', 'err'); return; }
+  const origId = document.getElementById('edit-cf-id').value;
+  const cf = cache.cashflow || [];
+  setBtn('save-cf-btn', true);
+  try {
+    if (origId) {
+      await apiPost('cashflow', 'update', { desc, amount, date, type }, origId);
+      showToast('แก้ไขแล้ว ✓');
+    } else {
+      const lastBal = cf.length ? Number(cf[cf.length - 1].balance) : 0;
+      const balance = type === 'income' ? lastBal + amount : lastBal - amount;
+      await apiPost('cashflow', 'add', { id: genId('CF', cf), date, desc, type, amount, balance });
+      showToast('บันทึกแล้ว ✓');
+    }
+    closeModal('mo-cf');
+    cache.cashflow = await apiGet('cashflow');
+    renderCashflow();
+  } catch (e) { showToast('บันทึกไม่สำเร็จ', 'err'); }
+  setBtn('save-cf-btn', false);
+}
+
+async function delCf(id) {
+  if (!ADMIN) { showToast('ต้องอยู่ใน Admin Mode', 'err'); return; }
+  const ok = await confirm2('ลบรายการนี้?');
+  if (!ok) return;
+  await apiPost('cashflow', 'delete', null, id);
+  cache.cashflow = await apiGet('cashflow');
+  renderCashflow();
+  showToast('ลบแล้ว');
+}
+
+// ========== NPL ==========
+function renderNpl() {
+  const npl = cache.npl || [];
+  const total = npl.reduce((s, n) => s + Number(n.outstanding || 0), 0);
+  const alert = document.getElementById('npl-alert');
+  alert.style.display = npl.length ? '' : 'none';
+  alert.innerHTML = `หนี้ค้างเกิน 1 ปี รวม <strong>${fmt(total)} บาท</strong> จาก ${npl.filter(n => Number(n.outstanding) > 0).length} ราย`;
+  document.getElementById('npl-tbody').innerHTML = npl.length ? npl.map(n => `
+    <tr>
+      <td class="mono">${n.id}</td><td style="font-weight:500">${n.name}</td>
+      <td style="font-size:12px">${n.phone || '—'}</td>
+      <td class="mono" style="color:var(--red);font-weight:700">${fmt(n.outstanding)}</td>
+      <td><span class="badge b-warn">${n.type}</span></td>
+      <td style="color:var(--g5)">${n.note || '—'}</td>
+      <td class="no-print"><div class="btn-grp">
+        <button class="btn btn-outline btn-xs" onclick='editNpl("${n.id}")'>✏</button>
+        <button class="btn btn-xs" style="background:var(--green-l);color:var(--green);border:1px solid #c0dd97" onclick='nplReceive("${n.id}")'>รับชำระ</button>
+        ${ADMIN ? `<button class="btn btn-danger btn-xs" onclick='delNpl("${n.id}")'>🗑</button>` : ''}
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--g5)">ไม่มีหนี้ค้าง</td></tr>';
+}
+
+function openNplForm() {
+  document.getElementById('mo-npl-title').textContent = 'เพิ่มหนี้ค้าง';
+  document.getElementById('edit-npl-id').value = '';
+  ['nf-id','nf-name','nf-phone','nf-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('nf-amt').value = '';
+  openModal('mo-npl');
+}
+
+function editNpl(id) {
+  const n = (cache.npl || []).find(x => x.id === id);
+  if (!n) return;
+  document.getElementById('mo-npl-title').textContent = 'แก้ไขหนี้ค้าง';
+  document.getElementById('edit-npl-id').value = id;
+  document.getElementById('nf-id').value = n.id || '';
+  document.getElementById('nf-name').value = n.name;
+  document.getElementById('nf-phone').value = n.phone || '';
+  document.getElementById('nf-amt').value = n.outstanding;
+  document.getElementById('nf-type').value = n.type;
+  document.getElementById('nf-note').value = n.note || '';
+  openModal('mo-npl');
+}
+
+async function saveNpl() {
+  const name = document.getElementById('nf-name').value.trim();
+  const amt = Number(document.getElementById('nf-amt').value);
+  if (!name || !amt) { showToast('กรุณากรอกชื่อและยอดค้าง', 'err'); return; }
+  const origId = document.getElementById('edit-npl-id').value;
+  const data = { id: origId || document.getElementById('nf-id').value || genId('NPL', cache.npl || []), name, phone: document.getElementById('nf-phone').value, outstanding: amt, type: document.getElementById('nf-type').value, note: document.getElementById('nf-note').value };
+  setBtn('save-npl-btn', true);
+  try {
+    if (origId) { await apiPost('npl', 'update', data, origId); showToast('แก้ไขแล้ว ✓'); }
+    else { await apiPost('npl', 'add', data); showToast('เพิ่มหนี้ค้างแล้ว ✓'); }
+    closeModal('mo-npl');
+    cache.npl = await apiGet('npl');
+    renderNpl();
+  } catch (e) { showToast('บันทึกไม่สำเร็จ', 'err'); }
+  setBtn('save-npl-btn', false);
+}
+
+async function delNpl(id) {
+  if (!ADMIN) { showToast('ต้องอยู่ใน Admin Mode', 'err'); return; }
+  const ok = await confirm2('ลบรายการนี้?');
+  if (!ok) return;
+  await apiPost('npl', 'delete', null, id);
+  cache.npl = await apiGet('npl');
+  renderNpl();
+  showToast('ลบแล้ว');
+}
+
+async function nplReceive(id) {
+  const n = (cache.npl || []).find(x => x.id === id);
+  if (!n) return;
+  const amtStr = prompt('รับชำระหนี้ ' + n.name + '\nยอดค้าง ' + fmt(n.outstanding) + ' บาท\nกรอกจำนวนที่รับ:');
+  const amt = Number(amtStr);
+  if (!amt || amt <= 0) return;
+  const newAmt = Math.max(0, Number(n.outstanding) - amt);
+  await apiPost('npl', 'update', { outstanding: newAmt, note: newAmt === 0 ? 'ปิดบัญชีแล้ว' : n.note }, id);
+  const cf = cache.cashflow || [];
+  const lastBal = cf.length ? Number(cf[cf.length - 1].balance) : 0;
+  await apiPost('cashflow', 'add', { id: genId('CF', cf), date: today(), desc: 'รับชำระหนี้ค้าง ' + n.name, type: 'income', amount: amt, balance: lastBal + amt });
+  cache.npl = await apiGet('npl');
+  cache.cashflow = await apiGet('cashflow');
+  renderNpl();
+  showToast('บันทึกการชำระแล้ว ✓');
+}
+
+// ========== APPLY FORM ==========
+function initApply() {
+  document.getElementById('app-date').value = today();
+  const sel = document.getElementById('app-member');
+  sel.innerHTML = '<option value="">-- เลือกสมาชิก --</option>' + (cache.members || []).map(m => `<option value="${m.id}">${m.id} — ${m.name}</option>`).join('');
+  calcApp();
+}
+
+function fillApplicant() {
+  const id = document.getElementById('app-member').value;
+  const m = (cache.members || []).find(x => x.id === id);
+  document.getElementById('app-name').value = m ? m.name : '';
+  document.getElementById('app-addr').value = m ? (m.addr || '') : '';
+}
+
+function calcApp() {
+  const cost = Number(document.getElementById('app-cost').value) || 0;
+  const rate = (Number(document.getElementById('app-rate').value) || 16) / 100;
+  const profit = Math.round(cost * rate), total = cost + profit;
+  const inst = Number(document.getElementById('app-inst').value) || 12;
+  const monthly = total ? Math.ceil(total / inst) : 0;
+  document.getElementById('app-profit').value = profit ? fmt(profit) : '';
+  document.getElementById('app-total').value = total ? fmt(total) : '';
+  document.getElementById('app-monthly').value = monthly ? fmt(monthly) : '';
+  const tbody = document.querySelector('#app-preview tbody');
+  if (!total) { tbody.innerHTML = ''; return; }
+  const startDate = new Date(document.getElementById('app-date').value || today());
+  let balance = total;
+  tbody.innerHTML = Array.from({ length: inst }, (_, i) => {
+    const d = new Date(startDate); d.setMonth(d.getMonth() + i + 1);
+    balance -= monthly;
+    return `<tr><td style="text-align:center">${i+1}</td><td>${d.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})}</td><td class="mono" style="text-align:right">${fmt(monthly)}</td><td class="mono" style="text-align:right;color:${balance>0?'var(--amber)':'var(--green)'}">${fmt(Math.max(0,balance))}</td></tr>`;
+  }).join('');
+}
+
+async function saveApplyAsLoan() {
+  const memberId = document.getElementById('app-member').value;
+  const cost = Number(document.getElementById('app-cost').value);
+  if (!memberId || !cost) { showToast('กรุณาเลือกสมาชิกและกรอกราคาทุน', 'err'); return; }
+  const member = (cache.members || []).find(m => m.id === memberId);
+  const rate = (Number(document.getElementById('fl-rate').value) || 16) / 100;
+  const profit = Math.round(cost * rate), total = cost + profit;
+  const inst = Number(document.getElementById('app-inst').value);
+  const monthly = Math.ceil(total / inst);
+  const id = genId('L', cache.loans || []);
+  const data = { id, memberId, memberName: member.name, type: document.getElementById('app-type').value, cost, profit, total, rate: Number(document.getElementById('app-rate').value)||16, installments: inst, monthly, date: document.getElementById('app-date').value, remaining: total, status: 'active', note: document.getElementById('app-item').value };
+  await apiPost('loans', 'add', data);
+  const cf = cache.cashflow || [];
+  const lastBal = cf.length ? Number(cf[cf.length - 1].balance) : 0;
+  await apiPost('cashflow', 'add', { id: genId('CF', cf), date: data.date, desc: 'Murabahah ' + member.name + ' — ' + (data.note || data.type), type: 'expense', amount: cost, balance: lastBal - cost });
+  cache.loans = await apiGet('loans');
+  cache.cashflow = await apiGet('cashflow');
+  populateLoanDDs();
+  showToast('บันทึกสินเชื่อ ' + id + ' แล้ว ✓');
+}
+
+// ========== PRINT A4 ==========
+function printLoan(id) {
+  const loan = (cache.loans || []).find(l => l.id === id);
+  if (!loan) return;
+  const member = (cache.members || []).find(m => m.id === loan.memberId) || {};
+  const payments = (cache.payments || []).filter(p => p.loanId === id);
+  const paidMap = {}; payments.forEach(p => paidMap[p.period] = p);
+  doPrint(loan, member.addr || '', loan.note || loan.type, '', payments, paidMap);
+}
+
+function printApplyForm() {
+  const memberId = document.getElementById('app-member').value;
+  const cost = Number(document.getElementById('app-cost').value);
+  if (!memberId || !cost) { showToast('กรุณาเลือกสมาชิกและกรอกราคาทุน', 'err'); return; }
+  const member = (cache.members || []).find(m => m.id === memberId);
+  const rate = (Number(document.getElementById('fl-rate').value) || 16) / 100;
+  const profit = Math.round(cost * rate), total = cost + profit;
+  const inst = Number(document.getElementById('app-inst').value);
+  const loan = { id: 'L-NEW', memberId, memberName: member.name, type: document.getElementById('app-type').value, cost, profit, total, installments: inst, monthly: Math.ceil(total/inst), date: document.getElementById('app-date').value };
+  doPrint(loan, member.addr || '', document.getElementById('app-item').value, document.getElementById('app-guarantor').value, [], {});
+}
+
+function doPrint(loan, addr, item, guarantor, payments, paidMap) {
+  const startDate = new Date(loan.date || today());
+  let balance = Number(loan.total);
+  let rows = '';
+  for (let i = 1; i <= Number(loan.installments); i++) {
+    const d = new Date(startDate); d.setMonth(d.getMonth() + i);
+    const dStr = d.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    const p = paidMap[i]; balance -= Number(loan.monthly);
+    rows += `<tr style="${p ? 'background:#f0f9f5' : ''}">
+      <td style="font-family:var(--mono);font-weight:600">${i}</td>
+      <td style="white-space:nowrap">${dStr}</td>
+      <td style="font-family:var(--mono);font-weight:600;text-align:right">${Number(loan.monthly).toLocaleString('th-TH')}</td>
+      <td style="min-width:75pt">${p ? '<span style="color:#0F6E56;font-weight:600">✓ ' + (p.date||'') + '</span>' : ''}</td>
+      <td style="font-family:var(--mono);color:#085041;text-align:right">${Math.max(0,balance).toLocaleString('th-TH')}</td>
+      <td style="min-width:60pt;text-align:left">${p && p.note ? p.note : ''}</td>
+    </tr>`;
+  }
+  const html = `<div class="pf-page">
+    <div class="pf-hdr">
+      <div><div class="pf-org-name">กลุ่มออมทรัพย์นะห์ลา</div><div class="pf-org-sub">NAHLA SAVINGS GROUP · อ.รือเสาะ จ.นราธิวาส</div><div class="pf-org-sub">ระบบ Murabahah · ปลอดดอกเบี้ย (Riba-Free)</div></div>
+      <div class="pf-doc-box"><div class="pf-doc-lbl">รหัสสัญญา</div><div class="pf-doc-id">${loan.id}</div><div class="pf-doc-lbl">วันที่ ${new Date(loan.date).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'})}</div></div>
+    </div>
+    <div class="pf-title-main">สัญญาซื้อขายแบบ Murabahah</div>
+    <div class="pf-halal">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ &nbsp;·&nbsp; สัญญานี้จัดทำตามหลักอิสลาม ปลอดดอกเบี้ย (Riba-Free) &nbsp;·&nbsp; กลุ่มซื้อสินค้าก่อน แล้วขายต่อในราคาที่ตกลง</div>
+    <div class="pf-sec-title">ข้อมูลผู้ขอสินเชื่อ</div>
+    <div class="pf-grid2">
+      <div class="pf-row" style="grid-template-columns:80pt 1fr;border-bottom:1pt solid #ddd;border-right:1pt solid #bbb"><div class="pf-lbl">ชื่อ-สกุล</div><div class="pf-val" style="font-weight:700">${loan.memberName}</div></div>
+      <div class="pf-row" style="grid-template-columns:80pt 1fr;border-bottom:1pt solid #ddd"><div class="pf-lbl">รหัสสมาชิก</div><div class="pf-val" style="font-family:monospace">${loan.memberId || '—'}</div></div>
+      <div class="pf-row" style="grid-template-columns:80pt 1fr;border-right:1pt solid #bbb"><div class="pf-lbl">ที่อยู่</div><div class="pf-val">${addr || '—'}</div></div>
+      <div class="pf-row" style="grid-template-columns:80pt 1fr"><div class="pf-lbl">ผู้ค้ำประกัน</div><div class="pf-val">${guarantor || '—'}</div></div>
+    </div>
+    <div class="pf-sec-title" style="margin-top:3mm">รายละเอียดสินค้า</div>
+    <div style="border:1pt solid #bbb">
+      <div class="pf-row" style="grid-template-columns:80pt 1fr;border-bottom:1pt solid #ddd"><div class="pf-lbl">ประเภทสินค้า</div><div class="pf-val">${loan.type}</div></div>
+      <div class="pf-row" style="grid-template-columns:80pt 1fr"><div class="pf-lbl">ชื่อสินค้า/รุ่น</div><div class="pf-val">${item || '—'}</div></div>
+    </div>
+    <div class="pf-amounts">
+      <div><div class="pf-amt-lbl">ราคาทุนสินค้า</div><div class="pf-amt-val">${Number(loan.cost).toLocaleString('th-TH')}</div><div class="pf-amt-lbl">บาท</div></div>
+      <div class="pf-amt-sep"><div class="pf-amt-lbl">กำไร Murabahah 16%</div><div class="pf-amt-val">${Number(loan.profit).toLocaleString('th-TH')}</div><div class="pf-amt-lbl">บาท</div></div>
+      <div class="pf-amt-sep"><div class="pf-amt-lbl">ราคาขายรวม (คงที่)</div><div class="pf-amt-val red">${Number(loan.total).toLocaleString('th-TH')}</div><div class="pf-amt-lbl">บาท · ${loan.installments} งวด</div></div>
+    </div>
+    <div class="pf-sec-title">ตารางชำระงวด</div>
+    <table class="pf-tbl">
+      <thead><tr><th style="width:30pt">งวดที่</th><th style="width:88pt">กำหนดชำระ</th><th style="width:68pt">จำนวนเงิน (บาท)</th><th style="width:78pt">ลายมือชื่อ</th><th style="width:68pt">คงเหลือ (บาท)</th><th>หมายเหตุ</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="2" style="text-align:right;padding:5pt 6pt;font-weight:700;border:1pt solid #9FE1CB">รวมทั้งสิ้น</td><td style="font-weight:700;border:1pt solid #9FE1CB;text-align:right">${Number(loan.total).toLocaleString('th-TH')}</td><td colspan="3" style="border:1pt solid #9FE1CB;font-size:9pt;color:#0F6E56;padding:5pt 6pt">ราคาคงที่ตลอดสัญญา — ไม่มีดอกเบี้ย</td></tr></tfoot>
+    </table>
+    <div class="pf-cond"><strong>เงื่อนไขสัญญา Murabahah:</strong> (1) กลุ่มนะห์ลาซื้อสินค้าในนามกลุ่มก่อน แล้วขายต่อในราคาข้างต้น (2) ราคา ${Number(loan.total).toLocaleString('th-TH')} บาท เป็นราคาคงที่ ไม่มีการเปลี่ยนแปลง (3) กรณีค้างชำระ ผู้ค้ำประกันรับผิดชอบแทน ไม่มีค่าปรับดอกเบี้ย (4) ทั้งสองฝ่ายอ่านและเข้าใจเงื่อนไขทั้งหมดแล้ว</div>
+    <div class="pf-sigs">
+      <div><div class="pf-stamp">ตราประทับ<br>กลุ่มนะห์ลา</div></div>
+      <div><div style="height:40pt"></div><div class="pf-sig-line">ลายมือชื่อผู้ขอสินเชื่อ</div><div style="font-size:10.5pt;font-weight:600;margin-top:3pt">(${loan.memberName})</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ............/............/............</div></div>
+      <div><div style="height:40pt"></div><div class="pf-sig-line">ลายมือชื่อประธานกลุ่ม</div><div style="font-size:10.5pt;font-weight:600;margin-top:3pt">(................................................)</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ............/............/............</div></div>
+    </div>
+    <div class="pf-footer"><span>กลุ่มออมทรัพย์นะห์ลา · Murabahah System · Riba-Free</span><span>พิมพ์ ${new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})}</span></div>
+  </div>`;
+  document.getElementById('print-area').innerHTML = html;
+  setTimeout(() => { window.print(); setTimeout(() => document.getElementById('print-area').innerHTML = '', 500); }, 100);
+}
+
+// ========== DROPDOWNS ==========
+function populateMemberDDs() {
+  const opts = '<option value="">-- เลือก --</option>' + (cache.members || []).map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  ['fl-member'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
+}
+function populateLoanDDs() {
+  const opts = '<option value="">-- เลือกสัญญา --</option>' + (cache.loans || []).filter(l => l.status === 'active').map(l => `<option value="${l.id}">${l.id} — ${l.memberName}</option>`).join('');
+  const el = document.getElementById('pay-loan'); if (el) el.innerHTML = opts;
+}
+
+// ========== LOCAL SEED (ออฟไลน์) ==========
+function loadLocalSeed() {
+  if (!localStorage.getItem('nahla_members')) {
+    const defaultMembers = [
+      {id:'P-00001',name:'นายอาหะมะสุมาซี หะยีดิง',addr:'230/12 ม.2 ต.รือเสาะ อ.รือเสาะ จ.นราธิวาส',phone:'',joined:'2022-01-01',share:6000},
+      {id:'P-00007',name:'นายอับดุลรอแม กาจิ',addr:'565/20 ม.1 ต.รือเสาะออก จ.นราธิวาส',phone:'098-0931237',joined:'2022-01-01',share:6000},
+      {id:'P-000022',name:'นางสาวซาเร๊าะ บินมะปีเยาะ',addr:'196 ม.2 ต.รือเสาะ จ.นราธิวาส',phone:'',joined:'2022-01-01',share:6000},
+    ];
+    localStorage.setItem('nahla_members', JSON.stringify(defaultMembers));
+  }
+  SHEET_NAMES.forEach(k => { cache[k] = JSON.parse(localStorage.getItem('nahla_' + k) || '[]'); });
+}
+
+// ========== CLOCK ==========
+function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('th-TH', { year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit' }); }
+</script>
+</body>
+</html>
