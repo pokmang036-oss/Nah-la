@@ -8,19 +8,22 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --teal:#0F6E56;--teal-l:#E1F5EE;--teal-m:#1D9E75;--teal-d:#085041;
-  --amber:#854F0B;--amber-l:#FAEEDA;--amber-m:#EF9F27;
+  /* ธีมผึ้ง — Nahla Bee Theme */
+  --teal:#8B6914;--teal-l:#FFF8E1;--teal-m:#F9A825;--teal-d:#5D4037;
+  --amber:#6D4C00;--amber-l:#FFF3E0;--amber-m:#FFB300;
   --red:#A32D2D;--red-l:#FCEBEB;
   --green:#3B6D11;--green-l:#EAF3DE;
   --purple:#534AB7;--purple-l:#EEEDFE;
   --g9:#1a1a1a;--g7:#444;--g5:#777;--g3:#ccc;--g1:#f5f5f5;--g0:#fafafa;
   --white:#fff;--sw:230px;
   --font:'Sarabun',sans-serif;--mono:'IBM Plex Mono',monospace;
+  /* Bee palette extras */
+  --bee-yellow:#FFD600;--bee-gold:#F9A825;--bee-dark:#4E342E;--bee-stripe:#1A1A1A;
 }
-body{font-family:var(--font);background:#eef2f0;color:var(--g9);display:flex;min-height:100vh;font-size:15px}
+body{font-family:var(--font);background:#FFF8E7;color:var(--g9);display:flex;min-height:100vh;font-size:15px}
 
 /* Sidebar */
-#sidebar{width:var(--sw);min-height:100vh;background:var(--teal-d);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+#sidebar{width:var(--sw);min-height:100vh;background:linear-gradient(180deg,#4E342E 0%,#3E2723 60%,#2C1810 100%);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
 .logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
 .logo-title{font-size:17px;font-weight:700;color:#fff}
 .logo-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;font-family:var(--mono)}
@@ -34,17 +37,17 @@ body{font-family:var(--font);background:#eef2f0;color:var(--g9);display:flex;min
 .nav-sec{padding:12px 18px 4px;font-size:10px;font-weight:600;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;transition:all .15s;border-left:3px solid transparent}
 .nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
-.nav-item.active{background:rgba(255,255,255,.13);color:#fff;border-left-color:var(--amber-m);font-weight:500}
+.nav-item.active{background:rgba(249,168,37,.2);color:#fff;border-left-color:#FFD600;font-weight:500}
 .nav-icon{width:17px;height:17px;flex-shrink:0}
 .sidebar-bot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.08)}
-.admin-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(239,159,39,.2);color:var(--amber-m);font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600;cursor:pointer;width:100%;justify-content:center}
+.admin-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,214,0,.25);color:#FFD600;font-size:11px;padding:3px 8px;border-radius:4px;font-weight:600;cursor:pointer;width:100%;justify-content:center}
 .admin-badge:hover{background:rgba(239,159,39,.35)}
 
 /* Main */
 #main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
 #admin-bar{background:linear-gradient(90deg,#412402,#633806);padding:5px 28px;display:none;align-items:center;gap:12px;font-size:12px;color:rgba(255,220,120,.85)}
 #admin-bar.on{display:flex}
-.topbar{background:var(--white);border-bottom:1px solid var(--g3);padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar{background:var(--white);border-bottom:3px solid #FFD600;padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .topbar-title{font-size:16px;font-weight:600}
 .topbar-actions{display:flex;gap:8px;align-items:center}
 .content{padding:22px 26px;flex:1}
@@ -53,11 +56,11 @@ body{font-family:var(--font);background:#eef2f0;color:var(--g9);display:flex;min
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .stat-card{background:var(--white);border-radius:12px;padding:16px 18px;border:1px solid var(--g3);position:relative;overflow:hidden}
 .stat-card::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%}
-.stat-teal::after{background:var(--teal-m)}.stat-green::after{background:var(--green)}.stat-amber::after{background:var(--amber-m)}.stat-red::after{background:var(--red)}
+.stat-teal::after{background:#F9A825}.stat-green::after{background:var(--green)}.stat-amber::after{background:var(--amber-m)}.stat-red::after{background:var(--red)}
 .stat-lbl{font-size:11px;color:var(--g5);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
 .stat-val{font-size:24px;font-weight:700;margin-top:4px;line-height:1}
 .stat-sub{font-size:12px;color:var(--g5);margin-top:3px}
-.stat-teal .stat-val{color:var(--teal)}.stat-green .stat-val{color:var(--green)}.stat-amber .stat-val{color:var(--amber)}.stat-red .stat-val{color:var(--red)}
+.stat-teal .stat-val{color:#8B6914}.stat-green .stat-val{color:var(--green)}.stat-amber .stat-val{color:var(--amber)}.stat-red .stat-val{color:var(--red)}
 
 /* Cards */
 .card{background:var(--white);border-radius:12px;border:1px solid var(--g3);margin-bottom:16px;overflow:hidden}
@@ -80,7 +83,7 @@ body{font-family:var(--font);background:#eef2f0;color:var(--g9);display:flex;min
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);white-space:nowrap}
-.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal-m)}
+.btn-primary{background:#8B6914;color:#fff}.btn-primary:hover{background:#F9A825;color:#1a1a1a}
 .btn-outline{background:transparent;border:1px solid var(--g3);color:var(--g7)}.btn-outline:hover{border-color:var(--teal);color:var(--teal)}
 .btn-danger{background:var(--red-l);color:var(--red);border:1px solid #f5c0c0}.btn-danger:hover{background:#f5c0c0}
 .btn-warn{background:var(--amber-l);color:var(--amber);border:1px solid #fac775}
@@ -169,32 +172,32 @@ select.form-control{cursor:pointer}
 /* Print form */
 .pf-page{width:210mm;min-height:297mm;font-family:'Sarabun',sans-serif;font-size:13pt;color:#111;background:#fff;padding:14mm 16mm;box-sizing:border-box}
 .pf-hdr{display:flex;justify-content:space-between;margin-bottom:6mm;padding-bottom:4mm;border-bottom:2.5pt solid #0F6E56}
-.pf-org-name{font-size:17pt;font-weight:700;color:#085041}
+.pf-org-name{font-size:17pt;font-weight:700;color:#4E342E}
 .pf-org-sub{font-size:10pt;color:#555;margin-top:2px}
 .pf-doc-box{background:#f0f9f5;border:1pt solid #0F6E56;border-radius:5pt;padding:8pt 12pt;text-align:center;min-width:100pt}
-.pf-doc-id{font-size:14pt;font-weight:700;color:#0F6E56;font-family:'IBM Plex Mono',monospace}
-.pf-title-main{text-align:center;font-size:16pt;font-weight:700;color:#085041;margin-bottom:3mm}
-.pf-halal{background:#e8f5f0;border:1pt solid #9FE1CB;border-radius:4pt;padding:5pt 10pt;text-align:center;margin:3mm 0;font-size:10pt;color:#0F6E56;font-weight:500}
-.pf-sec-title{font-size:11pt;font-weight:700;color:#085041;border-bottom:1pt solid #c0e8d8;padding-bottom:2pt;margin:4mm 0 2mm}
+.pf-doc-id{font-size:14pt;font-weight:700;color:#4E342E;font-family:'IBM Plex Mono',monospace}
+.pf-title-main{text-align:center;font-size:16pt;font-weight:700;color:#4E342E;margin-bottom:3mm}
+.pf-halal{background:#FFF8E1;border:1pt solid #F9A825;border-radius:4pt;padding:5pt 10pt;text-align:center;margin:3mm 0;font-size:10pt;color:#4E342E;font-weight:500}
+.pf-sec-title{font-size:11pt;font-weight:700;color:#4E342E;border-bottom:1.5pt solid #F9A825;padding-bottom:2pt;margin:4mm 0 2mm}
 .pf-grid2{display:grid;grid-template-columns:1fr 1fr;border:1pt solid #bbb}
 .pf-row{display:grid;border-bottom:1pt solid #ddd}.pf-row:last-child{border-bottom:none}
 .pf-lbl{background:#f5faf8;color:#444;font-weight:600;font-size:10pt;border-right:1pt solid #ddd;padding:5pt 8pt}
 .pf-val{color:#111;padding:5pt 8pt;font-size:11pt}
-.pf-amounts{background:#f0f9f5;border:2pt solid #0F6E56;border-radius:6pt;padding:8pt 14pt;margin:3mm 0;display:grid;grid-template-columns:repeat(3,1fr);gap:6pt;text-align:center}
+.pf-amounts{background:#FFF8E1;border:2pt solid #F9A825;border-radius:6pt;padding:8pt 14pt;margin:3mm 0;display:grid;grid-template-columns:repeat(3,1fr);gap:6pt;text-align:center}
 .pf-amt-lbl{font-size:9pt;color:#555;font-weight:600}
-.pf-amt-val{font-size:14pt;font-weight:700;color:#085041;font-family:'IBM Plex Mono',monospace;margin-top:2pt}
+.pf-amt-val{font-size:14pt;font-weight:700;color:#4E342E;font-family:'IBM Plex Mono',monospace;margin-top:2pt}
 .pf-amt-val.red{color:#A32D2D}
-.pf-amt-sep{border-left:1pt solid #9FE1CB}
+.pf-amt-sep{border-left:1pt solid #F9A825}
 .pf-tbl{width:100%;border-collapse:collapse;border:1pt solid #999;margin-top:2mm;font-size:10pt}
-.pf-tbl th{background:#085041;color:#fff;padding:5pt 6pt;text-align:center;font-size:9.5pt;font-weight:600;border:1pt solid #0a5a45}
+.pf-tbl th{background:#4E342E;color:#FFD600;padding:5pt 6pt;text-align:center;font-size:9.5pt;font-weight:600;border:1pt solid #3E2723}
 .pf-tbl td{padding:4.5pt 6pt;border:1pt solid #ccc;text-align:center;vertical-align:middle}
 .pf-tbl tr:nth-child(even) td{background:#f8fcfa}
-.pf-tbl tfoot td{background:#e8f5f0;font-weight:700;border:1pt solid #9FE1CB}
+.pf-tbl tfoot td{background:#FFF8E1;font-weight:700;border:1pt solid #F9A825}
 .pf-cond{background:#fffbf0;border:1pt solid #fac775;border-radius:4pt;padding:6pt 10pt;font-size:9.5pt;color:#5C4000;margin:3mm 0;line-height:1.7}
 .pf-sigs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12pt;margin-top:8mm;text-align:center}
 .pf-sig-line{border-top:1.5pt solid #999;padding-top:4pt;font-size:9.5pt;color:#444;margin-top:22pt}
 .pf-stamp{border:2pt dashed #0F6E56;border-radius:6pt;width:70pt;height:50pt;display:flex;align-items:center;justify-content:center;font-size:9pt;color:#0F6E56;margin:0 auto;text-align:center}
-.pf-footer{border-top:2pt solid #0F6E56;margin-top:8mm;padding-top:4pt;display:flex;justify-content:space-between;font-size:9pt;color:#666}
+.pf-footer{border-top:2pt solid #F9A825;margin-top:8mm;padding-top:4pt;display:flex;justify-content:space-between;font-size:9pt;color:#666}
 </style>
 </head>
 <body>
@@ -232,7 +235,7 @@ select.form-control{cursor:pointer}
 <!-- SIDEBAR -->
 <nav id="sidebar">
   <div class="logo">
-    <div class="logo-title">กลุ่มออมทรัพย์นะห์ลา</div>
+    <div class="logo-title" style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">🐝</span>กลุ่มออมทรัพย์นะห์ลา</div>
     <div class="logo-sub">NAHLA · REALTIME</div>
     <div class="sync-status">
       <div class="sync-dot" id="sync-dot"></div>
@@ -294,6 +297,9 @@ select.form-control{cursor:pointer}
         <div class="btn-grp no-print">
           <button class="btn btn-primary" onclick="openMemberForm()">+ เพิ่มสมาชิก</button>
           <button class="btn btn-outline" onclick="openShareForm()">+ บันทึกหุ้น</button>
+          <button class="btn btn-purple btn-sm" onclick="printAllMembers()">🖨 รายชื่อทั้งหมด</button>
+          <button class="btn btn-outline btn-sm" onclick="printMemberForm('register')">📋 ใบสมัคร</button>
+          <button class="btn btn-outline btn-sm" onclick="printMemberForm('resign')">📋 ใบลาออก</button>
           <button class="btn btn-outline" onclick="refreshPage('members')">↻ รีเฟรช</button>
         </div>
       </div>
@@ -308,11 +314,12 @@ select.form-control{cursor:pointer}
         <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-loan" placeholder="ค้นหา..." oninput="renderLoans()"></div>
         <div class="btn-grp no-print">
           <button class="btn btn-primary" onclick="openLoanForm()">+ เพิ่มสินเชื่อ</button>
+          <button class="btn btn-purple btn-sm" onclick="printAllLoans()">🖨 รายการสินเชื่อ</button>
           <button class="btn btn-outline" onclick="refreshPage('loans')">↻ รีเฟรช</button>
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th>ราคาทุน</th><th>กำไร 16%</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th>ราคาทุน</th><th>กำไร</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
       </div></div>
     </div>
 
@@ -412,6 +419,8 @@ select.form-control{cursor:pointer}
         <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-share" placeholder="ค้นหาชื่อ..." oninput="renderShares()"></div>
         <div class="btn-grp no-print">
           <button class="btn btn-primary" onclick="openShareForm()">+ บันทึกชำระหุ้น</button>
+          <button class="btn btn-purple btn-sm" onclick="printAllShares()">🖨 รายงานหุ้น</button>
+          <button class="btn btn-outline btn-sm" onclick="printMemberForm('withdraw')">📋 ใบถอนหุ้น</button>
           <button class="btn btn-outline" onclick="refreshPage('shares')">↻ รีเฟรช</button>
         </div>
       </div>
@@ -938,7 +947,9 @@ function renderLoans() {
       <td><span class="badge ${l.status==='active'?'b-info':'b-ok'}">${l.status==='active'?'กำลังผ่อน':'ปิดแล้ว'}</span></td>
       <td class="no-print"><div class="btn-grp">
         <button class="btn btn-outline btn-xs" onclick='showLoanDetail("${l.id}")'>ดู</button>
-        <button class="btn btn-purple btn-xs" onclick='printLoan("${l.id}")'>🖨</button>
+        <button class="btn btn-purple btn-xs" onclick='printLoan("${l.id}")'>🖨 สัญญา</button>
+        <button class="btn btn-xs" style="background:var(--teal-l);color:var(--teal);border:1px solid #9FE1CB" onclick='printInvoice("${l.id}")'>🧾 ใบแจ้งหนี้</button>
+        <button class="btn btn-xs" style="background:var(--red-l);color:var(--red);border:1px solid #f7c1c1" onclick='printDemand("${l.id}")'>⚠ เร่งรัด</button>
         ${ADMIN ? `<button class="btn btn-warn btn-xs" onclick='editLoan("${l.id}")'>✏</button><button class="btn btn-danger btn-xs" onclick='delLoan("${l.id}")'>🗑</button>` : ''}
       </div></td>
     </tr>`).join('') : '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">ไม่มีข้อมูลสินเชื่อ</td></tr>';
@@ -1035,9 +1046,11 @@ function showLoanDetail(id) {
     <div style="font-size:12px;color:var(--g5);margin-bottom:4px">ความคืบหน้า ${pct}%</div>
     <div class="prog" style="margin-bottom:16px"><div class="prog-fill" style="width:${pct}%"></div></div>
     <div style="font-size:13px;font-weight:600;margin-bottom:10px">ประวัติชำระ (${payments.length} งวด)</div>
-    ${payments.length ? `<table class="tbl"><thead><tr><th>วันที่</th><th>งวดที่</th><th>จำนวน</th><th>หมายเหตุ</th>${ADMIN ? '<th>ลบ</th>' : ''}</tr></thead><tbody>${payments.map(p => `<tr><td style="font-size:12px">${p.date}</td><td style="text-align:center">${p.period}</td><td class="mono" style="color:var(--green);font-weight:600">${fmt(p.amount)}</td><td style="color:var(--g5)">${p.note || '—'}</td>${ADMIN ? `<td><button class="btn btn-danger btn-xs" onclick="delPaymentItem('${p.id}','${id}')">🗑</button></td>` : ''}</tr>`).join('')}</tbody></table>` : '<div style="color:var(--g3);padding:12px 0;font-size:13px">ยังไม่มีประวัติชำระ</div>'}
+    ${payments.length ? `<table class="tbl"><thead><tr><th>วันที่</th><th>งวดที่</th><th>จำนวน</th><th>หมายเหตุ</th>${ADMIN ? '<th>ลบ</th>' : ''}</tr></thead><tbody>${payments.map(p => `<tr><td style="font-size:12px">${fmtDate(p.date)}</td><td style="text-align:center">${p.period}</td><td class="mono" style="color:var(--green);font-weight:600">${fmt(p.amount)}</td><td style="color:var(--g5)">${p.note || '—'}</td>${ADMIN ? `<td><button class="btn btn-danger btn-xs" onclick="delPaymentItem('${p.id}','${id}')">🗑</button></td>` : ''}</tr>`).join('')}</tbody></table>` : '<div style="color:var(--g3);padding:12px 0;font-size:13px">ยังไม่มีประวัติชำระ</div>'}
     <div style="margin-top:14px;display:flex;gap:8px">
-      <button class="btn btn-purple btn-sm" onclick='printLoan("${id}");closeModal("mo-detail")'>🖨 พิมพ์ A4</button>
+      <button class="btn btn-purple btn-sm" onclick='printLoan("${id}");closeModal("mo-detail")'>🖨 สัญญา</button>
+      <button class="btn btn-sm" style="background:var(--teal-l);color:var(--teal);border:1px solid #9FE1CB" onclick='printInvoice("${id}");closeModal("mo-detail")'>🧾 ใบแจ้งหนี้</button>
+      <button class="btn btn-sm" style="background:var(--red-l);color:var(--red);border:1px solid #f7c1c1" onclick='printDemand("${id}");closeModal("mo-detail")'>⚠ เร่งรัด</button>
       ${loan.status === 'active' ? `<button class="btn btn-danger btn-sm" onclick='closeLoan("${id}")'>ปิดบัญชี</button>` : '<span class="badge b-ok">ปิดบัญชีแล้ว</span>'}
     </div>`;
   openModal('mo-detail');
@@ -1075,7 +1088,7 @@ function renderPayments() {
   const list = (cache.payments || []).slice().reverse();
   document.getElementById('payments-tbody').innerHTML = list.length ? list.map(p => `
     <tr>
-      <td style="font-size:12px">${p.date}</td>
+      <td style="font-size:12px">${fmtDate(p.date)}</td>
       <td style="font-weight:500">${p.memberName}</td>
       <td class="mono">${p.loanId}</td>
       <td style="text-align:center">${p.period}</td>
@@ -1149,7 +1162,7 @@ function renderCashflow() {
   document.querySelector('#cf-table tbody').innerHTML = cf.length ? cf.map(r => {
     if (r.type === 'income') ti += Number(r.amount); else te += Number(r.amount);
     return `<tr>
-      <td style="font-size:12px">${r.date}</td><td>${r.desc}</td>
+      <td style="font-size:12px">${fmtDate(r.date)}</td><td>${r.desc}</td>
       <td><span class="badge ${r.type === 'income' ? 'b-ok' : 'b-danger'}">${r.type === 'income' ? 'รายรับ' : 'รายจ่าย'}</span></td>
       <td class="mono" style="color:var(--green)">${r.type === 'income' ? fmt(r.amount) : '—'}</td>
       <td class="mono" style="color:var(--red)">${r.type === 'expense' ? fmt(r.amount) : '—'}</td>
@@ -1237,6 +1250,7 @@ function renderNpl() {
       <td class="no-print"><div class="btn-grp">
         <button class="btn btn-outline btn-xs" onclick='editNpl("${n.id}")'>✏</button>
         <button class="btn btn-xs" style="background:var(--green-l);color:var(--green);border:1px solid #c0dd97" onclick='nplReceive("${n.id}")'>รับชำระ</button>
+        <button class="btn btn-xs" style="background:var(--red-l);color:var(--red);border:1px solid #f7c1c1" onclick='printNplDemand("${n.id}")'>⚠ เร่งรัด</button>
         ${ADMIN ? `<button class="btn btn-danger btn-xs" onclick='delNpl("${n.id}")'>🗑</button>` : ''}
       </div></td>
     </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--g5)">ไม่มีหนี้ค้าง</td></tr>';
@@ -1398,7 +1412,7 @@ function doPrint(loan, addr, item, guarantor, payments, paidMap) {
       <td style="font-family:var(--mono);font-weight:600">${i}</td>
       <td style="white-space:nowrap">${dStr}</td>
       <td style="font-family:var(--mono);font-weight:600;text-align:right">${Number(loan.monthly).toLocaleString('th-TH')}</td>
-      <td style="min-width:75pt">${p ? '<span style="color:#0F6E56;font-weight:600">✓ ' + (p.date||'') + '</span>' : ''}</td>
+      <td style="min-width:75pt">${p ? '<span style="color:#0F6E56;font-weight:600">✓ ' + fmtDate(p.date) + '</span>' : ''}</td>
       <td style="font-family:var(--mono);color:#085041;text-align:right">${Math.max(0,balance).toLocaleString('th-TH')}</td>
       <td style="min-width:60pt;text-align:left">${p && p.note ? p.note : ''}</td>
     </tr>`;
@@ -1406,7 +1420,7 @@ function doPrint(loan, addr, item, guarantor, payments, paidMap) {
   const html = `<div class="pf-page">
     <div class="pf-hdr">
       <div><div class="pf-org-name">กลุ่มออมทรัพย์นะห์ลา</div><div class="pf-org-sub">NAHLA SAVINGS GROUP · อ.รือเสาะ จ.นราธิวาส</div><div class="pf-org-sub">ระบบ Murabahah · ปลอดดอกเบี้ย (Riba-Free)</div></div>
-      <div class="pf-doc-box"><div class="pf-doc-lbl">รหัสสัญญา</div><div class="pf-doc-id">${loan.id}</div><div class="pf-doc-lbl">วันที่ ${new Date(loan.date).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'})}</div></div>
+      <div class="pf-doc-box"><div class="pf-doc-lbl">รหัสสัญญา</div><div class="pf-doc-id">${loan.id}</div><div class="pf-doc-lbl">วันที่ ${fmtDate(loan.date)}</div></div>
     </div>
     <div class="pf-title-main">สัญญาซื้อขายแบบ Murabahah</div>
     <div class="pf-halal">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ &nbsp;·&nbsp; สัญญานี้จัดทำตามหลักอิสลาม ปลอดดอกเบี้ย (Riba-Free) &nbsp;·&nbsp; กลุ่มซื้อสินค้าก่อน แล้วขายต่อในราคาที่ตกลง</div>
@@ -1433,8 +1447,7 @@ function doPrint(loan, addr, item, guarantor, payments, paidMap) {
       <tbody>${rows}</tbody>
       <tfoot><tr><td colspan="2" style="text-align:right;padding:5pt 6pt;font-weight:700;border:1pt solid #9FE1CB">รวมทั้งสิ้น</td><td style="font-weight:700;border:1pt solid #9FE1CB;text-align:right">${Number(loan.total).toLocaleString('th-TH')}</td><td colspan="3" style="border:1pt solid #9FE1CB;font-size:9pt;color:#0F6E56;padding:5pt 6pt">ราคาคงที่ตลอดสัญญา — ไม่มีดอกเบี้ย</td></tr></tfoot>
     </table>
-    <div class="pf-cond"><strong>เงื่อนไขสัญญา Murabahah:</strong> (1) กลุ่มนะห์ลาซื้อสินค้าในนามกลุ่มก่อน แล้วขายต่อในราคาข้างต้น (2) ราคา ${Number(loan.total).toLocaleString('th-TH')} บาท เป็นราคาคงที่ ไม่มีการเปลี่ยนแปลง (3) กรณีค้างชำระ ผู้ค้ำประกันรับผิดชอบแทน ไม่มีค่าปรับดอกเบี้ย (4) ทั้งสองฝ่ายอ่านและเข้าใจเงื่อนไขทั้งหมดแล้ว </div>
-    <div class="pf-cond"><strong>เอกสาร :</strong> (1) สำเนาบัตรประชาชนผู้ขอสินเชื่อ (2) สำเนาบัตรประชาชนผู้ค้ำประกัน </div>
+    <div class="pf-cond"><strong>เงื่อนไขสัญญา Murabahah:</strong> (1) กลุ่มนะห์ลาซื้อสินค้าในนามกลุ่มก่อน แล้วขายต่อในราคาข้างต้น (2) ราคา ${Number(loan.total).toLocaleString('th-TH')} บาท เป็นราคาคงที่ ไม่มีการเปลี่ยนแปลง (3) กรณีค้างชำระ ผู้ค้ำประกันรับผิดชอบแทน ไม่มีค่าปรับดอกเบี้ย (4) ทั้งสองฝ่ายอ่านและเข้าใจเงื่อนไขทั้งหมดแล้ว<br><strong>เอกสารแนบ:</strong> (1) สำเนาบัตรประชาชนผู้ขอสินเชื่อ (2) สำเนาบัตรประชาชนผู้ค้ำประกัน</div>
     <div class="pf-sigs">
       <div><div class="pf-stamp">ตราประทับ<br>กลุ่มนะห์ลา</div></div>
       <div><div style="height:40pt"></div><div class="pf-sig-line">ลายมือชื่อผู้ขอสินเชื่อ</div><div style="font-size:10.5pt;font-weight:600;margin-top:3pt">(${loan.memberName})</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ............/............/............</div></div>
@@ -1505,6 +1518,7 @@ function renderMembers() {
       <td style="font-size:12px">${fmtDate(m.joined)}</td>
       <td class="mono" style="font-weight:600;color:var(--teal)">${fmt(accumulated)}</td>
       <td class="no-print"><div class="btn-grp">
+        <button class="btn btn-purple btn-xs" onclick='printMemberDetail("${m.id}")'>🖨</button>
         <button class="btn btn-outline btn-xs" onclick='editMember("${m.id}")'>✏ แก้ไข</button>
         ${ADMIN ? `<button class="btn btn-danger btn-xs" onclick='delMember("${m.id}")'>🗑</button>` : ''}
       </div></td>
@@ -1543,7 +1557,7 @@ function renderShares() {
 
   document.getElementById('shares-tbody').innerHTML = list.length ?
     list.slice().reverse().map(s => `<tr>
-      <td style="font-size:12px">${s.date||'—'}</td>
+      <td style="font-size:12px">${fmtDate(s.date)}</td>
       <td class="mono">${s.memberId||'—'}</td>
       <td style="font-weight:500">${s.memberName||'—'}</td>
       <td class="mono" style="color:${s.type==='ถอนหุ้น'?'var(--red)':'var(--green)'};font-weight:600">${s.type==='ถอนหุ้น'?'-':''}${fmt(s.amount)}</td>
@@ -1625,8 +1639,11 @@ function renderReport() {
   // Build year options from cashflow
   const years = [...new Set(cf.map(r => r.date ? r.date.slice(0,4) : null).filter(Boolean))].sort().reverse();
   const yearSel = document.getElementById('rpt-year');
-  const curYear = yearSel.value || years[0] || new Date().getFullYear().toString();
-  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y===curYear?'selected':''}>${y}</option>`).join('');
+  const thisYear = String(new Date().getFullYear());
+  const curYear = (yearSel.value && years.includes(yearSel.value)) ? yearSel.value : (years[0] || thisYear);
+  if (!years.includes(thisYear)) years.unshift(thisYear);
+  yearSel.innerHTML = [...new Set([...years])].sort().reverse().map(y => `<option value="${y}" ${y===curYear?'selected':''}>${y}</option>`).join('');
+
 
   const monthSel = document.getElementById('rpt-month');
   monthSel.style.display = type === 'monthly' ? '' : 'none';
@@ -1653,7 +1670,7 @@ function renderReport() {
     if (!l.date) return false;
     const y = l.date.slice(0,4), m = l.date.slice(5,7);
     if (type === 'yearly') return y === curYear;
-    return y === curYear && (document.getElementById('rpt-month').value||curMonth) === m;
+    return y === curYear && curMonth === m;
   });
   const totalLoanCost = loansInPeriod.reduce((s,l) => s + Number(l.cost||0), 0);
   const totalLoanProfit = loansInPeriod.reduce((s,l) => s + Number(l.profit||0), 0);
@@ -1671,14 +1688,14 @@ function renderReport() {
 
   // Income table
   document.getElementById('rpt-income-tbody').innerHTML = income.length ?
-    income.map(r => `<tr><td style="font-size:12px">${r.date}</td><td>${r.desc}</td><td class="mono" style="text-align:right;color:var(--green);font-weight:600">${fmt(r.amount)}</td></tr>`).join('')
+    income.map(r => `<tr><td style="font-size:12px">${fmtDate(r.date)}</td><td>${r.desc}</td><td class="mono" style="text-align:right;color:var(--green);font-weight:600">${fmt(r.amount)}</td></tr>`).join('')
     + `<tr style="background:var(--green-l)"><td colspan="2" style="font-weight:700;padding:8px 14px">รวม</td><td class="mono" style="text-align:right;font-weight:700;color:var(--green);padding:8px 14px">${fmt(totalIn)}</td></tr>`
     : '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--g5)">ไม่มีรายรับ</td></tr>';
   document.getElementById('rpt-income-total').textContent = fmt(totalIn) + ' บาท';
 
   // Expense table
   document.getElementById('rpt-expense-tbody').innerHTML = expense.length ?
-    expense.map(r => `<tr><td style="font-size:12px">${r.date}</td><td>${r.desc}</td><td class="mono" style="text-align:right;color:var(--red);font-weight:600">${fmt(r.amount)}</td></tr>`).join('')
+    expense.map(r => `<tr><td style="font-size:12px">${fmtDate(r.date)}</td><td>${r.desc}</td><td class="mono" style="text-align:right;color:var(--red);font-weight:600">${fmt(r.amount)}</td></tr>`).join('')
     + `<tr style="background:var(--red-l)"><td colspan="2" style="font-weight:700;padding:8px 14px">รวม</td><td class="mono" style="text-align:right;font-weight:700;color:var(--red);padding:8px 14px">${fmt(totalEx)}</td></tr>`
     : '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--g5)">ไม่มีรายจ่าย</td></tr>';
   document.getElementById('rpt-expense-total').textContent = fmt(totalEx) + ' บาท';
@@ -1696,6 +1713,560 @@ function renderReport() {
     : '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--g5)">ไม่มีสินเชื่อในช่วงนี้</td></tr>';
 }
 
+
+// ╔══════════════════════════════════════════════════╗
+// ║         PRINT FUNCTIONS — กลุ่มนะห์ลา            ║
+// ╚══════════════════════════════════════════════════╝
+
+const BANK_INFO = {
+  name: 'นายอุสมาน สุหลง',
+  bank: 'ธนาคารกรุงไทย',
+  account: '494-0-31022-1',
+  promptpay: '098-679-7379',
+  note: '**แจ้งหลักฐานการโอนเงิน (สลิปการโอน) พร้อมชื่อ ที่อยู่ และเบอร์โทร'
+};
+
+// ── Shared print helper ──────────────────────────────
+function openPrintWindow(html) {
+  const win = window.open('', '_blank', 'width=850,height=1100');
+  win.document.write(`<!DOCTYPE html><html lang="th"><head>
+  <meta charset="UTF-8">
+  <title>กลุ่มออมทรัพย์นะห์ลา</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Sarabun',sans-serif;background:#fff;color:#111;font-size:13pt}
+    @page{size:A4 portrait;margin:12mm 14mm}
+    @media print{body{margin:0;padding:0}}
+    .page{width:210mm;min-height:297mm;padding:12mm 14mm;box-sizing:border-box;position:relative}
+    .hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3pt solid #F9A825;padding-bottom:4mm;margin-bottom:5mm}
+    .org-name{font-size:16pt;font-weight:700;color:#4E342E}
+    .org-sub{font-size:9.5pt;color:#555;margin-top:2pt}
+    .doc-box{background:#FFF8E1;border:1.5pt solid #F9A825;border-radius:5pt;padding:7pt 12pt;text-align:center;min-width:95pt}
+    .doc-id{font-size:13pt;font-weight:700;color:#4E342E;font-family:'IBM Plex Mono',monospace}
+    .doc-lbl{font-size:9pt;color:#555;margin-top:2pt}
+    .title{text-align:center;margin-bottom:4mm}
+    .title-main{font-size:15pt;font-weight:700;color:#4E342E}
+    .title-sub{font-size:10pt;color:#777;margin-top:2pt}
+    .sec{font-size:11pt;font-weight:700;color:#4E342E;border-bottom:1.5pt solid #F9A825;padding-bottom:2pt;margin:4mm 0 2mm}
+    .info-grid{display:grid;grid-template-columns:100pt 1fr;border:1pt solid #bbb;margin-bottom:3mm}
+    .info-grid.two{grid-template-columns:1fr 1fr}
+    .il{background:#f5faf8;font-weight:600;font-size:10pt;color:#444;padding:5pt 8pt;border-right:1pt solid #ddd;border-bottom:1pt solid #ddd}
+    .iv{color:#111;padding:5pt 8pt;font-size:11pt;border-bottom:1pt solid #ddd}
+    .il:last-of-type,.iv:last-of-type{border-bottom:none}
+    .tbl{width:100%;border-collapse:collapse;border:1pt solid #999;font-size:10pt}
+    .tbl th{background:#4E342E;color:#FFD600;padding:5pt 6pt;text-align:center;font-weight:600;border:1pt solid #3E2723}
+    .tbl td{padding:4.5pt 6pt;border:1pt solid #ccc;text-align:center;vertical-align:middle}
+    .tbl tr:nth-child(even) td{background:#f8fcfa}
+    .tbl tfoot td{background:#FFF8E1;font-weight:700;border:1pt solid #F9A825}
+    .tbl .td-l{text-align:left}
+    .tbl .td-r{text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600}
+    .amount-box{background:#FFF8E1;border:2pt solid #F9A825;border-radius:6pt;padding:8pt 14pt;margin:3mm 0;display:grid;grid-template-columns:repeat(3,1fr);gap:6pt;text-align:center}
+    .amt-lbl{font-size:9pt;color:#555;font-weight:600}
+    .amt-val{font-size:14pt;font-weight:700;color:#4E342E;font-family:'IBM Plex Mono',monospace;margin-top:2pt}
+    .amt-val.red{color:#A32D2D}
+    .amt-sep{border-left:1pt solid #F9A825}
+    .payment-box{border:2pt solid #F9A825;border-radius:6pt;padding:10pt 14pt;margin:4mm 0;display:grid;grid-template-columns:1fr 1fr;gap:10pt;align-items:center;background:#FFFDE7}
+    .pay-info{font-size:10.5pt}
+    .pay-name{font-size:14pt;font-weight:700;color:#4E342E;margin:3pt 0}
+    .pay-account{font-size:13pt;font-weight:700;color:#8B6914;font-family:'IBM Plex Mono',monospace}
+    .pay-bank{font-size:11pt;color:#555}
+    .pay-qr-box{border:2pt solid #F9A825;border-radius:6pt;padding:8pt;text-align:center;background:#FFF8E1}
+    .pay-qr-title{font-size:10pt;font-weight:700;color:#4E342E;margin-bottom:4pt}
+    .pay-qr-scan{font-size:9pt;color:#555;margin-top:4pt}
+    .warn-box{background:#FCEBEB;border:1.5pt solid #A32D2D;border-radius:5pt;padding:8pt 12pt;margin:3mm 0;font-size:10.5pt;color:#A32D2D}
+    .warn-title{font-size:13pt;font-weight:700;margin-bottom:4pt}
+    .cond{background:#fffbf0;border:1pt solid #fac775;border-radius:4pt;padding:6pt 10pt;font-size:9.5pt;color:#5C4000;margin:3mm 0;line-height:1.7}
+    .sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:12pt;margin-top:8mm;text-align:center}
+    .sig-line{border-top:1.5pt solid #999;padding-top:4pt;font-size:9.5pt;color:#444;margin-top:22pt}
+    .sig-name{font-size:10.5pt;font-weight:600;margin-top:3pt}
+    .stamp{border:2pt dashed #8B6914;border-radius:6pt;width:70pt;height:50pt;display:flex;align-items:center;justify-content:center;font-size:9pt;color:#8B6914;margin:0 auto;text-align:center;line-height:1.4}
+    .footer{border-top:2pt solid #F9A825;margin-top:6mm;padding-top:4pt;display:flex;justify-content:space-between;font-size:9pt;color:#666}
+    .badge{display:inline-block;padding:2pt 7pt;border-radius:4pt;font-size:10pt;font-weight:600}
+    .b-ok{background:#EAF3DE;color:#3B6D11}.b-warn{background:#FAEEDA;color:#854F0B}.b-danger{background:#FCEBEB;color:#A32D2D}.b-info{background:#FFF8E1;color:#8B6914}
+    .mono{font-family:'IBM Plex Mono',monospace;font-weight:500}
+    .text-center{text-align:center}.text-right{text-align:right}
+    .fw7{font-weight:700}.mt2{margin-top:2mm}.mt4{margin-top:4mm}
+    hr{border:none;border-top:1pt solid #ddd;margin:4mm 0}
+    .page-break{page-break-after:always}
+    .highlight-box{background:#FFF8E1;border-left:4pt solid #F9A825;border-radius:5pt;padding:10pt 14pt;margin:3mm 0;font-size:11pt}
+    .demand-header{background:#A32D2D;color:#fff;text-align:center;padding:10pt;border-radius:6pt 6pt 0 0;margin-bottom:0}
+    .demand-body{border:2pt solid #A32D2D;border-top:none;border-radius:0 0 6pt 6pt;padding:12pt}
+  </style></head><body><div class="page">${html}</div></body></html>`);
+  win.document.close();
+  win.onload = () => { setTimeout(() => win.print(), 400); };
+}
+
+function paymentBlock() {
+  return `
+    <div class="sec">ช่องทางการชำระเงิน</div>
+    <div class="payment-box">
+      <div class="pay-info">
+        <div style="font-size:9.5pt;color:#555;font-weight:600;margin-bottom:3pt">ชื่อบัญชี</div>
+        <div class="pay-name">${BANK_INFO.name}</div>
+        <div class="pay-bank">${BANK_INFO.bank}</div>
+        <div class="pay-account">${BANK_INFO.account}</div>
+        <div style="margin-top:8pt;font-size:9pt;color:#555;line-height:1.6">${BANK_INFO.note}</div>
+      </div>
+      <div class="pay-qr-box">
+        <div class="pay-qr-title">PromptPay</div>
+        <div style="font-size:22pt;font-weight:700;color:#4E342E;font-family:monospace;letter-spacing:2pt;margin:8pt 0">${BANK_INFO.promptpay}</div>
+        <div style="font-size:9pt;color:#555">โอนผ่าน PromptPay / บัญชีกรุงไทย</div>
+        <div style="margin-top:6pt;font-size:9pt;color:#4E342E;font-weight:600">เลขบัญชี ${BANK_INFO.account}</div>
+      </div>
+    </div>`;
+}
+
+function printHeader(docId, docLabel, date) {
+  return `
+    <div class="hdr">
+      <div>
+        <div class="org-name">🐝 กลุ่มออมทรัพย์นะห์ลา</div>
+        <div class="org-sub">NAHLA SAVINGS GROUP · อ.รือเสาะ จ.นราธิวาส</div>
+        <div class="org-sub">ระบบ Murabahah · ปลอดดอกเบี้ย</div>
+      </div>
+      <div class="doc-box">
+        <div class="doc-lbl">${docLabel}</div>
+        <div class="doc-id">${docId}</div>
+        <div class="doc-lbl">วันที่ ${date || fmtDate(today())}</div>
+      </div>
+    </div>`;
+}
+
+function printFooter() {
+  return `<div class="footer"><span>กลุ่มออมทรัพย์นะห์ลา · Nahla Savings Group</span><span>พิมพ์วันที่ ${fmtDate(today())}</span></div>`;
+}
+
+// ══════════════════════════════════════════════
+// 1. ใบแจ้งหนี้ค่างวด (Invoice)
+// ══════════════════════════════════════════════
+function printInvoice(loanId) {
+  const loan = (cache.loans||[]).find(l => l.id === loanId);
+  if (!loan) { showToast('ไม่พบสินเชื่อ','err'); return; }
+  const payments = (cache.payments||[]).filter(p => p.loanId === loanId);
+  const nextPeriod = payments.length + 1;
+  const dueDate = (() => {
+    const d = new Date(loan.date || today());
+    d.setMonth(d.getMonth() + nextPeriod);
+    return fmtDate(d.toISOString().slice(0,10));
+  })();
+  const remaining = Number(loan.remaining||0);
+  const paid = Number(loan.total||0) - remaining;
+
+  const html = `
+    ${printHeader('INV-'+loan.id, 'ใบแจ้งหนี้', fmtDate(today()))}
+    <div class="title">
+      <div class="title-main">ใบแจ้งหนี้ / Invoice</div>
+      <div class="title-sub">กำหนดชำระค่างวด Murabahah</div>
+    </div>
+    <div class="sec">ข้อมูลผู้กู้</div>
+    <div class="info-grid">
+      <div class="il">ชื่อ-สกุล</div><div class="iv fw7">${loan.memberName}</div>
+      <div class="il">รหัสสัญญา</div><div class="iv mono">${loan.id}</div>
+      <div class="il">ประเภทสินค้า</div><div class="iv">${loan.type}</div>
+      <div class="il">วันที่สัญญา</div><div class="iv">${fmtDate(loan.date)}</div>
+    </div>
+    <div class="amount-box">
+      <div><div class="amt-lbl">ราคาขาย Murabahah</div><div class="amt-val">${fmt(loan.total)}</div><div class="amt-lbl">บาท</div></div>
+      <div class="amt-sep"><div class="amt-lbl">ชำระแล้ว</div><div class="amt-val">${fmt(paid)}</div><div class="amt-lbl">บาท</div></div>
+      <div class="amt-sep"><div class="amt-lbl">คงเหลือ</div><div class="amt-val red">${fmt(remaining)}</div><div class="amt-lbl">บาท</div></div>
+    </div>
+    <div class="sec">รายละเอียดงวดที่ต้องชำระ</div>
+    <table class="tbl">
+      <thead><tr><th>งวดที่</th><th>กำหนดชำระ</th><th>จำนวนเงิน (บาท)</th><th>สถานะ</th></tr></thead>
+      <tbody>
+        ${(() => {
+          // สร้างตารางงวดทั้งหมดตามสัญญา
+          const startD = new Date(loan.date || today());
+          const paidSet = {};
+          payments.forEach(p => { paidSet[Number(p.period)] = p; });
+          let rows = '';
+          for (let i = 1; i <= Number(loan.installments); i++) {
+            const d = new Date(startD);
+            d.setMonth(d.getMonth() + i);
+            const dStr = fmtDate(d.toISOString().slice(0,10));
+            const p = paidSet[i];
+            if (p) {
+              rows += '<tr style="background:#FFF8E1"><td>' + i + '</td><td>' + fmtDate(p.date) + '</td><td class=\"td-r\">' + fmt(p.amount) + '</td><td><span class=\"badge b-ok\">ชำระแล้ว</span></td></tr>';
+            } else {
+              const isNext = i === nextPeriod;
+              const bg = isNext ? 'background:#fff3cd' : '';
+              const badge = isNext ? '<span class=\"badge b-warn\">รอชำระ</span>' : '<span class=\"badge b-gray\">ยังไม่ถึงกำหนด</span>';
+              rows += '<tr style=\"' + bg + '\"><td class=\"fw7\">' + i + '</td><td>' + dStr + '</td><td class=\"td-r fw7\" style=\"color:#A32D2D\">' + fmt(loan.monthly) + '</td><td>' + badge + '</td></tr>';
+            }
+          }
+          return rows;
+        })()}
+      </tbody>
+      <tfoot><tr><td colspan="2" class="td-r fw7">คงเหลือทั้งสิ้น</td><td class="td-r" style="color:#A32D2D">${fmt(remaining)}</td><td>${loan.status==='closed'?'<span class=\"badge b-ok\">ปิดบัญชีแล้ว</span>':'งวด '+nextPeriod+'–'+loan.installments}</td></tr></tfoot>
+    </table>
+    ${loan.status==='closed'?'<div class="highlight-box" style="text-align:center;font-size:13pt;font-weight:700;color:#3B6D11;margin:3mm 0">✓ ปิดบัญชีสินเชื่อเรียบร้อยแล้ว ขอบคุณ</div>':paymentBlock()}
+    <div class="cond">${loan.status==='closed'?'สัญญานี้ปิดบัญชีสมบูรณ์แล้ว เก็บไว้เป็นหลักฐาน':'กรุณาชำระภายในวันที่ '+dueDate+' · หากมีข้อสงสัยติดต่อคณะกรรมการกลุ่มออมทรัพย์นะห์ลา'}</div>
+    <div class="sigs">
+      <div><div class="stamp">ตราประทับ<br>กลุ่มนะห์ลา</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อผู้รับแจ้ง</div><div class="sig-name">(${loan.memberName})</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อเจ้าหน้าที่</div><div class="sig-name">(……………………………………)</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 2. เอกสารเร่งรัดหนี้สินเชื่อ (Demand Letter)
+// ══════════════════════════════════════════════
+function printDemand(loanId) {
+  const loan = (cache.loans||[]).find(l => l.id === loanId);
+  if (!loan) { showToast('ไม่พบสินเชื่อ','err'); return; }
+  const payments = (cache.payments||[]).filter(p => p.loanId === loanId);
+  const overdue = Number(loan.installments||0) - payments.length;
+  const isLegal = overdue >= 3;
+
+  const html = `
+    ${printHeader('DMD-'+loan.id, 'หนังสือเร่งรัด', fmtDate(today()))}
+    <div class="demand-header"><div style="font-size:14pt;font-weight:700">หนังสือแจ้งเตือนและเร่งรัดหนี้</div><div style="font-size:10pt;margin-top:3pt">กลุ่มออมทรัพย์นะห์ลา · Nahla Savings Group</div></div>
+    <div class="demand-body">
+      <div style="margin-bottom:8pt;font-size:10.5pt">วันที่ ${fmtDate(today())}</div>
+      <div style="margin-bottom:10pt;font-size:11pt;line-height:1.8">
+        เรื่อง : แจ้งเตือนการค้างชำระหนี้สินเชื่อ Murabahah<br>
+        เรียน : <strong>${loan.memberName}</strong><br>
+        อ้างอิงสัญญา : <span class="mono">${loan.id}</span> · ประเภทสินค้า : ${loan.type}
+      </div>
+      <div style="font-size:10.5pt;line-height:1.9">
+        &nbsp;&nbsp;&nbsp;&nbsp;ตามที่ท่านได้ทำสัญญา Murabahah กับกลุ่มออมทรัพย์นะห์ลา เมื่อวันที่ ${fmtDate(loan.date)} ในวงเงิน <strong>${fmt(loan.total)} บาท</strong> กำหนดผ่อนชำระ ${loan.installments} งวด งวดละ <strong>${fmt(loan.monthly)} บาท</strong> นั้น
+      </div>
+      <div class="warn-box mt4">
+        <div class="warn-title">⚠ สถานะการชำระ</div>
+        ชำระแล้ว ${payments.length} งวด · ค้างชำระ <strong>${overdue} งวด</strong> · ยอดคงค้างทั้งสิ้น <strong>${fmt(loan.remaining)} บาท</strong>
+      </div>
+      <div style="font-size:10.5pt;line-height:1.9;margin-top:8pt">
+        &nbsp;&nbsp;&nbsp;&nbsp;กลุ่มออมทรัพย์นะห์ลา ขอแจ้งให้ท่านทราบว่า ท่านมียอดค้างชำระดังกล่าว จึงขอให้ท่านดำเนินการชำระหนี้คงค้างภายใน <strong>15 วัน</strong> นับจากวันที่ได้รับหนังสือนี้
+      </div>
+      ${isLegal ? `
+      <div class="warn-box mt4" style="border-color:#7B1414">
+        <div class="warn-title">⚠ แจ้งเตือนการดำเนินการตามระเบียบ</div>
+        เนื่องจากท่านค้างชำระเกิน 3 งวด กลุ่มฯ มีสิทธิ์ดำเนินการตามระเบียบกลุ่มและกฎหมายที่เกี่ยวข้อง ได้แก่
+        <ul style="margin-top:6pt;padding-left:18pt;line-height:2">
+          <li>เรียกให้ผู้ค้ำประกันรับผิดชอบชำระหนี้แทน</li>
+          <li>หักจากเงินหุ้นและเงินออมของสมาชิก</li>
+          <li>ดำเนินการทางกฎหมายฟ้องร้องต่อศาล</li>
+        </ul>
+      </div>` : ''}
+      <div style="margin-top:10pt;font-size:10.5pt">หากท่านมีข้อสงสัยหรือต้องการเจรจา กรุณาติดต่อคณะกรรมการกลุ่มออมทรัพย์นะห์ลาโดยด่วน</div>
+    </div>
+    ${paymentBlock()}
+    <div class="sigs">
+      <div><div class="stamp">ตราประทับ<br>กลุ่มนะห์ลา</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อประธานกลุ่ม</div><div class="sig-name">(……………………………………)</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อผู้รับหนังสือ</div><div class="sig-name">(${loan.memberName})</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 3. เร่งรัดหนี้ค้าง NPL
+// ══════════════════════════════════════════════
+function printNplDemand(nplId) {
+  const n = (cache.npl||[]).find(x => x.id === nplId);
+  if (!n) return;
+  const html = `
+    ${printHeader('NPL-'+n.id, 'หนังสือเร่งรัด', fmtDate(today()))}
+    <div class="demand-header"><div style="font-size:14pt;font-weight:700">หนังสือเร่งรัดหนี้ค้างชำระ</div><div style="font-size:10pt;margin-top:3pt">กลุ่มออมทรัพย์นะห์ลา · เกินกำหนด 1 ปีขึ้นไป</div></div>
+    <div class="demand-body">
+      <div style="margin-bottom:10pt;font-size:11pt;line-height:1.8">
+        วันที่ ${fmtDate(today())}<br>
+        เรียน : <strong>${n.name}</strong><br>
+        รหัสสมาชิก : <span class="mono">${n.id}</span> · ประเภทสินเชื่อ : ${n.type}
+      </div>
+      <div class="warn-box">
+        <div class="warn-title">⚠ ยอดหนี้ค้างชำระ</div>
+        <div style="font-size:18pt;font-weight:700;margin:6pt 0">${fmt(n.outstanding)} บาท</div>
+        ค้างชำระเกินกำหนด 1 ปี — ต้องดำเนินการโดยด่วน
+      </div>
+      <div style="font-size:10.5pt;line-height:1.9;margin-top:8pt">
+        &nbsp;&nbsp;&nbsp;&nbsp;ท่านมียอดหนี้ค้างชำระเกินกำหนดเป็นเวลาเกิน 1 ปี กลุ่มออมทรัพย์นะห์ลาขอเรียกร้องให้ท่านชำระหนี้คงค้างทั้งหมดภายใน <strong>30 วัน</strong> นับจากวันที่ได้รับหนังสือฉบับนี้ มิฉะนั้นกลุ่มฯ จะดำเนินการ ดังนี้
+      </div>
+      <ul style="margin:8pt 0 8pt 20pt;font-size:10.5pt;line-height:2.2">
+        <li>เรียกให้ผู้ค้ำประกันรับผิดชอบชำระหนี้แทนทันที</li>
+        <li>หักจากเงินหุ้นและเงินออมของสมาชิกในกลุ่ม</li>
+        <li>แจ้งคณะกรรมการเพื่อพิจารณาระงับสิทธิ์สมาชิก</li>
+        <li>ดำเนินการทางกฎหมายฟ้องร้องต่อศาลตามกฎหมายแพ่งและพาณิชย์</li>
+      </ul>
+      <div style="font-size:10.5pt;margin-top:8pt">หมายเหตุ : ${n.note||'—'}</div>
+    </div>
+    ${paymentBlock()}
+    <div class="sigs">
+      <div><div class="stamp">ตราประทับ<br>กลุ่มนะห์ลา</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อประธานกลุ่ม</div><div class="sig-name">(……………………………………)</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อผู้รับหนังสือ</div><div class="sig-name">(${n.name})</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 4. รายชื่อสมาชิกทั้งหมด
+// ══════════════════════════════════════════════
+function printAllMembers() {
+  const members = cache.members || [];
+  const shares = cache.shares || [];
+  const cumMap = {};
+  shares.forEach(s => {
+    if (!cumMap[s.memberId]) cumMap[s.memberId] = 0;
+    cumMap[s.memberId] += s.type==='ถอนหุ้น' ? -Number(s.amount||0) : Number(s.amount||0);
+  });
+  const totalShare = members.reduce((a,m) => a + (cumMap[m.id]||0), 0);
+
+  const rows = members.map((m,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td class="td-l mono">${m.id}</td>
+      <td class="td-l fw7">${m.name}</td>
+      <td class="td-l" style="font-size:9pt">${m.phone||'—'}</td>
+      <td class="td-l" style="font-size:8.5pt">${m.addr||'—'}</td>
+      <td>${fmtDate(m.joined)}</td>
+      <td class="td-r">${fmt(cumMap[m.id]||0)}</td>
+    </tr>`).join('');
+
+  const html = `
+    ${printHeader('RPT-MBR', 'รายงาน', fmtDate(today()))}
+    <div class="title"><div class="title-main">รายชื่อสมาชิกทั้งหมด</div><div class="title-sub">กลุ่มออมทรัพย์นะห์ลา · สมาชิก ${members.length} คน</div></div>
+    <div class="highlight-box" style="margin-bottom:4mm">สมาชิกทั้งหมด <strong>${members.length} คน</strong> · เงินหุ้นรวม <strong>${fmt(totalShare)} บาท</strong></div>
+    <table class="tbl">
+      <thead><tr><th>#</th><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์โทร</th><th>ที่อยู่</th><th>วันเข้า</th><th>หุ้นสะสม (บาท)</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="6" class="td-r fw7">รวมหุ้นทั้งหมด</td><td class="td-r">${fmt(totalShare)}</td></tr></tfoot>
+    </table>
+    <div class="sigs" style="margin-top:6mm">
+      <div></div>
+      <div><div style="height:28pt"></div><div class="sig-line">ลายมือชื่อประธานกลุ่ม</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 5. รายการสินเชื่อทั้งหมด
+// ══════════════════════════════════════════════
+function printAllLoans() {
+  const loans = cache.loans || [];
+  const active = loans.filter(l => l.status==='active');
+  const closed = loans.filter(l => l.status!=='active');
+  const totalOut = active.reduce((a,l)=>a+Number(l.remaining||0),0);
+  const totalProfit = loans.reduce((a,l)=>a+Number(l.profit||0),0);
+
+  const rows = loans.map((l,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td class="td-l mono" style="font-size:8.5pt">${l.id}</td>
+      <td class="td-l fw7" style="font-size:9pt">${l.memberName}</td>
+      <td style="font-size:8.5pt">${l.type}</td>
+      <td class="td-r">${fmt(l.cost)}</td>
+      <td class="td-r">${fmt(l.profit)}</td>
+      <td class="td-r fw7">${fmt(l.total)}</td>
+      <td>${l.installments}</td>
+      <td class="td-r" style="color:${Number(l.remaining)>0?'#A32D2D':'#3B6D11'}">${fmt(l.remaining)}</td>
+      <td>${fmtDate(l.date)}</td>
+      <td><span class="badge ${l.status==='active'?'b-info':'b-ok'}" style="font-size:8pt">${l.status==='active'?'ผ่อน':'ปิด'}</span></td>
+    </tr>`).join('');
+
+  const html = `
+    ${printHeader('RPT-LOAN', 'รายงาน', fmtDate(today()))}
+    <div class="title"><div class="title-main">รายการสินเชื่อทั้งหมด</div><div class="title-sub">กลุ่มออมทรัพย์นะห์ลา · ${loans.length} สัญญา</div></div>
+    <div class="amount-box" style="margin-bottom:4mm">
+      <div><div class="amt-lbl">สินเชื่อทั้งหมด</div><div class="amt-val">${loans.length}</div><div class="amt-lbl">สัญญา</div></div>
+      <div class="amt-sep"><div class="amt-lbl">คงค้างรวม</div><div class="amt-val red">${fmt(totalOut)}</div><div class="amt-lbl">บาท</div></div>
+      <div class="amt-sep"><div class="amt-lbl">กำไร Murabahah</div><div class="amt-val">${fmt(totalProfit)}</div><div class="amt-lbl">บาท</div></div>
+    </div>
+    <table class="tbl" style="font-size:9pt">
+      <thead><tr><th>#</th><th>รหัส</th><th>ชื่อสมาชิก</th><th>ประเภท</th><th>ทุน</th><th>กำไร</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>วันที่</th><th>สถานะ</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="8" class="td-r fw7">รวมคงค้าง</td><td class="td-r">${fmt(totalOut)}</td><td colspan="2"></td></tr></tfoot>
+    </table>
+    <div class="sigs" style="margin-top:6mm">
+      <div></div>
+      <div><div style="height:28pt"></div><div class="sig-line">ลายมือชื่อประธานกลุ่ม</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 6. รายงานหุ้นทั้งหมด
+// ══════════════════════════════════════════════
+function printAllShares() {
+  const members = cache.members || [];
+  const shares = cache.shares || [];
+  const cumMap = {};
+  shares.forEach(s => {
+    if (!cumMap[s.memberId]) cumMap[s.memberId] = {name:s.memberName, total:0, count:0};
+    cumMap[s.memberId].total += s.type==='ถอนหุ้น'?-Number(s.amount||0):Number(s.amount||0);
+    cumMap[s.memberId].count++;
+  });
+  const totalNet = Object.values(cumMap).reduce((a,v)=>a+v.total,0);
+
+  const rows = members.map((m,i) => {
+    const d = cumMap[m.id]||{total:0,count:0};
+    return `<tr>
+      <td>${i+1}</td>
+      <td class="td-l mono">${m.id}</td>
+      <td class="td-l fw7">${m.name}</td>
+      <td>${fmtDate(m.joined)}</td>
+      <td>${d.count}</td>
+      <td class="td-r fw7" style="color:${d.total>0?'#3B6D11':'#A32D2D'}">${fmt(d.total)}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `
+    ${printHeader('RPT-SHARE', 'รายงาน', fmtDate(today()))}
+    <div class="title"><div class="title-main">รายงานหุ้นสมาชิกทั้งหมด</div><div class="title-sub">กลุ่มออมทรัพย์นะห์ลา</div></div>
+    <div class="highlight-box" style="margin-bottom:4mm">สมาชิก ${members.length} คน · เงินหุ้นสุทธิรวม <strong>${fmt(totalNet)} บาท</strong> · รายการทั้งหมด ${shares.length} รายการ</div>
+    <table class="tbl">
+      <thead><tr><th>#</th><th>รหัส</th><th>ชื่อ-สกุล</th><th>วันเข้า</th><th>รายการ</th><th>หุ้นสะสม (บาท)</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="5" class="td-r fw7">รวมทั้งหมด</td><td class="td-r">${fmt(totalNet)}</td></tr></tfoot>
+    </table>
+    <div class="sigs" style="margin-top:6mm">
+      <div></div>
+      <div><div style="height:28pt"></div><div class="sig-line">ลายมือชื่อประธานกลุ่ม</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 7. ใบสมัครสมาชิก / ใบลาออก / ใบถอนหุ้น
+// ══════════════════════════════════════════════
+function printMemberForm(type) {
+  const titles = {
+    register: { th: 'ใบสมัครสมาชิก', en: 'Membership Application Form' },
+    resign:   { th: 'ใบลาออกสมาชิก', en: 'Membership Resignation Form' },
+    withdraw: { th: 'ใบถอนหุ้น', en: 'Share Withdrawal Form' }
+  };
+  const t = titles[type] || titles.register;
+
+  const extraFields = type === 'withdraw' ? `
+    <div class="sec">รายละเอียดการถอนหุ้น</div>
+    <div class="info-grid">
+      <div class="il">จำนวนหุ้นที่ถอน</div><div class="iv">…………………………… บาท</div>
+      <div class="il">ยอดหุ้นสะสม</div><div class="iv">…………………………… บาท</div>
+      <div class="il">เหตุผลการถอน</div><div class="iv" style="min-height:30pt">………………………………………………………………………</div>
+      <div class="il">ช่องทางรับเงิน</div><div class="iv">…………………………………………………………………………</div>
+    </div>` :
+  type === 'resign' ? `
+    <div class="sec">เหตุผลการลาออก</div>
+    <div style="border:1pt solid #bbb;min-height:50pt;padding:8pt;margin-bottom:3mm;font-size:10.5pt;color:#aaa">กรอกเหตุผลการลาออก…</div>
+    <div class="info-grid">
+      <div class="il">ยอดหุ้นสะสม</div><div class="iv">…………………………… บาท</div>
+      <div class="il">ต้องการรับหุ้นคืน</div><div class="iv">□ ใช่  □ ไม่ใช่  จำนวน …………… บาท</div>
+      <div class="il">สินเชื่อค้างชำระ</div><div class="iv">□ ไม่มี  □ มี จำนวน …………… บาท (ต้องชำระก่อนลาออก)</div>
+    </div>` : `
+    <div class="sec">ข้อมูลเพิ่มเติม</div>
+    <div class="info-grid">
+      <div class="il">อาชีพ</div><div class="iv">………………………………………………………………</div>
+      <div class="il">รายได้ต่อเดือน</div><div class="iv">…………………………… บาท</div>
+      <div class="il">ค่าหุ้นที่ต้องการ</div><div class="iv">…………………………… บาท (ขั้นต่ำ 100 บาท)</div>
+    </div>
+    <div class="cond mt4">เงื่อนไขการสมัคร: (1) ต้องมีอายุ 15 ปีขึ้นไป (2) ค่าธรรมเนียมแรกเข้า 100 บาท (3) ออมเดือนละ 100 บาทขึ้นไป (4) ต้องออมครบ 6 เดือนก่อนขอสินเชื่อ</div>`;
+
+  const html = `
+    ${printHeader(type.toUpperCase()+'-FORM', t.th, fmtDate(today()))}
+    <div class="title"><div class="title-main">${t.th}</div><div class="title-sub">${t.en} · กลุ่มออมทรัพย์นะห์ลา</div></div>
+    <div class="sec">ข้อมูลส่วนตัว</div>
+    <div class="info-grid">
+      <div class="il">ชื่อ-สกุล</div><div class="iv">………………………………………………………………</div>
+      <div class="il">รหัสสมาชิก</div><div class="iv mono">………………………………</div>
+      <div class="il">วันเกิด</div><div class="iv">……/……/……</div>
+      <div class="il">เลขบัตรประชาชน</div><div class="iv mono">…… - ………… - ……… - …… - …</div>
+      <div class="il">ที่อยู่</div><div class="iv" style="min-height:28pt">………………………………………………………………………………………………………</div>
+      <div class="il">เบอร์โทรศัพท์</div><div class="iv mono">…………………………………</div>
+    </div>
+    ${extraFields}
+    <div class="cond mt4">
+      ข้าพเจ้าขอรับรองว่าข้อมูลที่กรอกทั้งหมดเป็นความจริง และยินยอมปฏิบัติตามระเบียบของกลุ่มออมทรัพย์นะห์ลาทุกประการ
+    </div>
+    <div class="sigs">
+      <div><div class="stamp">ตราประทับ<br>กลุ่มนะห์ลา</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อผู้ยื่น</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+      <div><div style="height:30pt"></div><div class="sig-line">ลายมือชื่อประธาน/เลขานุการ</div><div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div></div>
+    </div>
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// 8. พิมพ์ข้อมูลรายคน (สมาชิก + สินเชื่อ + หุ้น)
+// ══════════════════════════════════════════════
+function printMemberDetail(memberId) {
+  const m = (cache.members||[]).find(x => x.id === memberId);
+  if (!m) return;
+  const loans = (cache.loans||[]).filter(l => l.memberId === memberId);
+  const payments = cache.payments||[];
+  const shareItems = (cache.shares||[]).filter(s => s.memberId === memberId);
+  const totalShare = shareItems.reduce((a,s)=>a+(s.type==='ถอนหุ้น'?-Number(s.amount||0):Number(s.amount||0)),0);
+  const activeLoans = loans.filter(l=>l.status==='active');
+  const totalRemaining = activeLoans.reduce((a,l)=>a+Number(l.remaining||0),0);
+
+  const loanRows = loans.map(l => {
+    const lPay = payments.filter(p=>p.loanId===l.id);
+    const pct = l.total>0?Math.round(((Number(l.total)-Number(l.remaining))/Number(l.total))*100):0;
+    return `<tr>
+      <td class="td-l mono" style="font-size:8.5pt">${l.id}</td>
+      <td class="td-l" style="font-size:8.5pt">${l.type}</td>
+      <td class="td-r">${fmt(l.cost)}</td>
+      <td class="td-r">${fmt(l.total)}</td>
+      <td>${l.installments}</td>
+      <td class="td-r">${fmt(l.remaining)}</td>
+      <td>${pct}%</td>
+      <td>${fmtDate(l.date)}</td>
+      <td><span class="badge ${l.status==='active'?'b-info':'b-ok'}" style="font-size:8pt">${l.status==='active'?'ผ่อน':'ปิด'}</span></td>
+    </tr>`;
+  }).join('');
+
+  const shareRows = shareItems.map(s=>`<tr>
+    <td>${fmtDate(s.date)}</td>
+    <td><span class="badge ${s.type==='ถอนหุ้น'?'b-danger':'b-ok'}" style="font-size:8pt">${s.type}</span></td>
+    <td class="td-r">${fmt(s.amount)}</td>
+    <td class="td-l" style="font-size:8.5pt">${s.note||'—'}</td>
+  </tr>`).join('');
+
+  const html = `
+    ${printHeader(m.id, 'ข้อมูลรายคน', fmtDate(today()))}
+    <div class="title"><div class="title-main">ข้อมูลสมาชิก</div><div class="title-sub">รายละเอียดครบถ้วน · กลุ่มออมทรัพย์นะห์ลา</div></div>
+    <div class="sec">ข้อมูลส่วนตัว</div>
+    <div class="info-grid">
+      <div class="il">ชื่อ-สกุล</div><div class="iv fw7">${m.name}</div>
+      <div class="il">รหัสสมาชิก</div><div class="iv mono">${m.id}</div>
+      <div class="il">เบอร์โทร</div><div class="iv">${m.phone||'—'}</div>
+      <div class="il">ที่อยู่</div><div class="iv">${m.addr||'—'}</div>
+      <div class="il">วันเข้ากลุ่ม</div><div class="iv">${fmtDate(m.joined)}</div>
+    </div>
+    <div class="amount-box" style="margin:3mm 0">
+      <div><div class="amt-lbl">หุ้นสะสม</div><div class="amt-val">${fmt(totalShare)}</div><div class="amt-lbl">บาท</div></div>
+      <div class="amt-sep"><div class="amt-lbl">สินเชื่อคงค้าง</div><div class="amt-val red">${fmt(totalRemaining)}</div><div class="amt-lbl">บาท</div></div>
+      <div class="amt-sep"><div class="amt-lbl">จำนวนสัญญา</div><div class="amt-val">${loans.length}</div><div class="amt-lbl">สัญญา</div></div>
+    </div>
+    ${loans.length?`<div class="sec">ประวัติสินเชื่อ</div>
+    <table class="tbl" style="font-size:9pt">
+      <thead><tr><th>รหัส</th><th>ประเภท</th><th>ทุน</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>%</th><th>วันที่</th><th>สถานะ</th></tr></thead>
+      <tbody>${loanRows}</tbody>
+    </table>`:''}
+    ${shareItems.length?`<div class="sec">ประวัติหุ้น</div>
+    <table class="tbl" style="font-size:9pt">
+      <thead><tr><th>วันที่</th><th>ประเภท</th><th>จำนวน (บาท)</th><th>หมายเหตุ</th></tr></thead>
+      <tbody>${shareRows}</tbody>
+      <tfoot><tr><td colspan="2" class="td-r fw7">หุ้นสะสมสุทธิ</td><td class="td-r">${fmt(totalShare)}</td><td></td></tr></tfoot>
+    </table>`:''}
+    ${printFooter()}`;
+  openPrintWindow(html);
+}
+
+// ══════════════════════════════════════════════
+// Clock (DO NOT REMOVE THIS COMMENT ANCHOR)
+// ══════════════════════════════════════════════
 // ========== CLOCK ==========
 function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('th-TH', { year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit' }); }
 </script>
