@@ -249,6 +249,10 @@ select.form-control{cursor:pointer}
     <div class="nav-sec">การเงิน</div>
     <div class="nav-item" data-page="cashflow"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>รายรับ-จ่าย</div>
     <div class="nav-item" data-page="npl"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>หนี้ค้าง / NPL</div>
+    <div class="nav-sec">หุ้น</div>
+    <div class="nav-item" data-page="shares"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>จัดการหุ้น</div>
+    <div class="nav-sec">รายงาน</div>
+    <div class="nav-item" data-page="report"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h4"/></svg>สรุปรายเดือน/ปี</div>
     <div class="nav-sec">เอกสาร</div>
     <div class="nav-item" data-page="apply"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>แบบขอสินเชื่อ</div>
   </div>
@@ -284,10 +288,12 @@ select.form-control{cursor:pointer}
 
     <!-- MEMBERS -->
     <div class="page" id="page-members">
+      <div id="member-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px"></div>
       <div class="page-bar">
         <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-member" placeholder="ค้นหา..." oninput="renderMembers()"></div>
         <div class="btn-grp no-print">
           <button class="btn btn-primary" onclick="openMemberForm()">+ เพิ่มสมาชิก</button>
+          <button class="btn btn-outline" onclick="openShareForm()">+ บันทึกหุ้น</button>
           <button class="btn btn-outline" onclick="refreshPage('members')">↻ รีเฟรช</button>
         </div>
       </div>
@@ -306,7 +312,7 @@ select.form-control{cursor:pointer}
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th>ราคาทุน</th><th>กำไร</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th>ราคาทุน</th><th>กำไร 16%</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
       </div></div>
     </div>
 
@@ -396,6 +402,53 @@ select.form-control{cursor:pointer}
           <div style="font-size:12px;font-weight:700;color:var(--teal-d);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">ตัวอย่างตารางชำระ</div>
           <div style="overflow-x:auto"><table class="tbl" id="app-preview" style="min-width:580px"><thead><tr><th>งวดที่</th><th>กำหนดชำระ</th><th>จำนวนเงิน (บาท)</th><th>คงเหลือ (บาท)</th></tr></thead><tbody></tbody></table></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ===== SHARES (หุ้น) ===== -->
+    <div class="page" id="page-shares">
+      <div id="share-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px"></div>
+      <div class="page-bar">
+        <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-share" placeholder="ค้นหาชื่อ..." oninput="renderShares()"></div>
+        <div class="btn-grp no-print">
+          <button class="btn btn-primary" onclick="openShareForm()">+ บันทึกชำระหุ้น</button>
+          <button class="btn btn-outline" onclick="refreshPage('shares')">↻ รีเฟรช</button>
+        </div>
+      </div>
+      <div class="card"><div style="padding:0">
+        <table class="tbl"><thead><tr><th>วันที่</th><th>รหัส</th><th>ชื่อ-สกุล</th><th>จำนวน (บาท)</th><th>สะสมรวม</th><th>ประเภท</th><th>หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead>
+        <tbody id="shares-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- ===== REPORT (สรุปรายเดือน/ปี) ===== -->
+    <div class="page" id="page-report">
+      <div class="page-bar" style="flex-wrap:wrap;gap:10px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select class="form-control" id="rpt-type" onchange="renderReport()" style="width:150px">
+            <option value="monthly">รายเดือน</option>
+            <option value="yearly">รายปี</option>
+          </select>
+          <select class="form-control" id="rpt-year" onchange="renderReport()" style="width:110px"></select>
+          <select class="form-control" id="rpt-month" onchange="renderReport()" style="width:130px"></select>
+        </div>
+        <button class="btn btn-outline no-print" onclick="window.print()">🖨 พิมพ์</button>
+      </div>
+      <div id="rpt-summary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card">
+          <div class="card-header"><span class="card-title">รายรับ</span><span id="rpt-income-total" style="font-size:13px;font-weight:700;color:var(--green)"></span></div>
+          <div style="padding:0"><table class="tbl"><thead><tr><th>วันที่</th><th>รายการ</th><th style="text-align:right">จำนวน (บาท)</th></tr></thead><tbody id="rpt-income-tbody"></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">รายจ่าย</span><span id="rpt-expense-total" style="font-size:13px;font-weight:700;color:var(--red)"></span></div>
+          <div style="padding:0"><table class="tbl"><thead><tr><th>วันที่</th><th>รายการ</th><th style="text-align:right">จำนวน (บาท)</th></tr></thead><tbody id="rpt-expense-tbody"></tbody></table></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">สรุปสินเชื่อที่ปล่อยในช่วงนี้</span></div>
+        <div style="padding:0"><table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อสมาชิก</th><th>ราคาทุน</th><th>กำไร (บาท)</th><th>% กำไร</th><th>สถานะ</th></tr></thead>
+        <tbody id="rpt-loans-tbody"></tbody></table></div>
       </div>
     </div>
 
@@ -493,6 +546,38 @@ select.form-control{cursor:pointer}
   </div>
 </div>
 
+<!-- Share Form Modal -->
+<div class="mo" id="mo-share">
+  <div class="mo-box" style="width:480px">
+    <div class="mo-hd"><span class="mo-title" id="mo-share-title">บันทึกชำระหุ้น</span><button class="mo-close" onclick="closeModal('mo-share')">×</button></div>
+    <div class="mo-body">
+      <input type="hidden" id="edit-share-id">
+      <div class="form-row">
+        <div class="form-group"><label>สมาชิก *</label><select class="form-control" id="sf-member" onchange="fillShareMember()"><option value="">-- เลือก --</option></select></div>
+        <div class="form-group"><label>วันที่ *</label><input type="date" class="form-control" id="sf-date"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px"><label>ชื่อ-สกุล</label><input class="form-control" id="sf-name" readonly style="background:var(--g0)"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ประเภท</label>
+          <select class="form-control" id="sf-type">
+            <option value="ชำระหุ้น">ชำระหุ้น</option>
+            <option value="ถอนหุ้น">ถอนหุ้น</option>
+            <option value="ปันผลหุ้น">ปันผลหุ้น</option>
+            <option value="ค่าสมัคร">ค่าสมัคร (100 บาท)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>จำนวน (บาท) *</label><input type="number" class="form-control" id="sf-amount" min="1"></div>
+      </div>
+      <div class="form-group"><label>หมายเหตุ</label><input class="form-control" id="sf-note" placeholder="ไม่บังคับ"></div>
+    </div>
+    <div class="mo-ft">
+      <button class="btn btn-outline" onclick="closeModal('mo-share')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveShare()" id="save-share-btn">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm -->
 <div id="cdlg"><div id="cbox"><div id="cmsg"></div><div id="cacts"><button class="btn btn-outline" onclick="cResolve(false)">ยกเลิก</button><button class="btn btn-danger" id="cok" onclick="cResolve(true)">ยืนยัน</button></div></div></div>
 
@@ -508,8 +593,8 @@ let ADMIN = false;
 let cache = { members:[], loans:[], payments:[], cashflow:[], npl:[] };
 let currentPage = 'dashboard';
 
-const SHEET_NAMES = ['members','loans','payments','cashflow','npl'];
-const PAGE_TITLES = {dashboard:'ภาพรวม',members:'ทะเบียนสมาชิก',loans:'ข้อมูลสินเชื่อ',payments:'บันทึกชำระ',cashflow:'รายรับ-จ่าย',npl:'หนี้ค้าง / NPL',apply:'แบบขอสินเชื่อ'};
+const SHEET_NAMES = ['members','loans','payments','cashflow','npl','shares'];
+const PAGE_TITLES = {dashboard:'ภาพรวม',members:'ทะเบียนสมาชิก',loans:'ข้อมูลสินเชื่อ',payments:'บันทึกชำระ',cashflow:'รายรับ-จ่าย',npl:'หนี้ค้าง / NPL',shares:'จัดการหุ้นสมาชิก',report:'สรุปรายเดือน/รายปี',apply:'แบบขอสินเชื่อ'};
 
 // ========== SETUP ==========
 function connectSheet() {
@@ -647,6 +732,7 @@ async function syncAll() {
     for (const sheet of SHEET_NAMES) {
       cache[sheet] = await apiGet(sheet);
     }
+    if (!cache.shares) cache.shares = [];
     setSyncStatus('ok', 'Sync แล้ว ' + new Date().toLocaleTimeString('th-TH'));
     renderPage(currentPage);
     populateMemberDDs();
@@ -706,7 +792,7 @@ document.querySelectorAll('.nav-item').forEach(el => {
 });
 
 function renderPage(pg) {
-  const map = {dashboard: renderDashboard, members: renderMembers, loans: renderLoans, payments: renderPayments, cashflow: renderCashflow, npl: renderNpl, apply: initApply};
+  const map = {dashboard: renderDashboard, members: renderMembers, loans: renderLoans, payments: renderPayments, cashflow: renderCashflow, npl: renderNpl, shares: renderShares, report: renderReport, apply: initApply};
   if (map[pg]) map[pg]();
 }
 
@@ -740,6 +826,20 @@ function showToast(msg, type = '') {
 // ========== UTILS ==========
 const fmt = n => Number(n || 0).toLocaleString('th-TH');
 const today = () => new Date().toISOString().slice(0, 10);
+function fmtDate(s) {
+  if (!s) return '—';
+  const raw = String(s).trim();
+  // ถ้าเป็น ISO string เช่น 2022-01-01 ให้แปลงตรง
+  const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) {
+    const d = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
+    return d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+  }
+  // fallback
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+}
 function genId(prefix, list) { return prefix + '-' + String(list.length + 1).padStart(4, '0') + '-' + Date.now().toString().slice(-3); }
 function thDate(s) { if (!s) return '—'; const d = new Date(s); d.setDate(d.getDate()+1); return d.toLocaleDateString('th-TH', {year:'numeric',month:'long',day:'numeric'}); }
 function setBtn(id, loading) { const b = document.getElementById(id); if (!b) return; b.disabled = loading; b.innerHTML = loading ? '<span class="spinner"></span> กำลังบันทึก...' : '💾 บันทึก'; }
@@ -764,22 +864,6 @@ function renderDashboard() {
 }
 
 // ========== MEMBERS ==========
-function renderMembers() {
-  const q = (document.getElementById('srch-member') || {}).value || '';
-  const list = (cache.members || []).filter(m => !q || m.name.includes(q) || m.id.includes(q));
-  document.getElementById('members-tbody').innerHTML = list.length ? list.map(m => `
-    <tr>
-      <td class="mono">${m.id}</td><td style="font-weight:500">${m.name}</td>
-      <td style="font-size:12px">${m.phone || '—'}</td>
-      <td style="font-size:12px;color:var(--g5)">${m.addr || '—'}</td>
-      <td style="font-size:12px">${m.joined || '—'}</td>
-      <td class="mono">${fmt(m.share)}</td>
-      <td class="no-print"><div class="btn-grp">
-        <button class="btn btn-outline btn-xs" onclick='editMember("${m.id}")'>✏ แก้ไข</button>
-        ${ADMIN ? `<button class="btn btn-danger btn-xs" onclick='delMember("${m.id}")'>🗑</button>` : ''}
-      </div></td>
-    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">ไม่มีข้อมูลสมาชิก</td></tr>';
-}
 
 function openMemberForm() {
   document.getElementById('mo-member-title').textContent = 'เพิ่มสมาชิกใหม่';
@@ -907,7 +991,7 @@ async function saveLoan() {
   const profit = Math.round(cost * rate), total = cost + profit;
   const inst = Number(document.getElementById('fl-inst').value);
   const monthly = Math.ceil(total / inst);
-  const data = { memberId, memberName: member.name, type: document.getElementById('fl-type').value, cost, profit, total, rate: Number(document.getElementById('fl-rate').value)||16, installments: inst, monthly, date: document.getElementById('fl-date').value, status: document.getElementById('fl-status').value, note: document.getElementById('fl-note').value };
+  const data = { memberId, memberName: member.name, type: document.getElementById('fl-type').value, cost, profit, total, installments: inst, monthly, date: document.getElementById('fl-date').value, status: document.getElementById('fl-status').value, note: document.getElementById('fl-note').value, rate: Number(document.getElementById('fl-rate').value)||16 };
   setBtn('save-loan-btn', true);
   try {
     if (origId) {
@@ -1264,12 +1348,12 @@ async function saveApplyAsLoan() {
   const cost = Number(document.getElementById('app-cost').value);
   if (!memberId || !cost) { showToast('กรุณาเลือกสมาชิกและกรอกราคาทุน', 'err'); return; }
   const member = (cache.members || []).find(m => m.id === memberId);
-  const rate = (Number(document.getElementById('fl-rate').value) || 16) / 100;
+  const rate = (Number(document.getElementById('app-rate').value) || 16) / 100;
   const profit = Math.round(cost * rate), total = cost + profit;
   const inst = Number(document.getElementById('app-inst').value);
   const monthly = Math.ceil(total / inst);
   const id = genId('L', cache.loans || []);
-  const data = { id, memberId, memberName: member.name, type: document.getElementById('app-type').value, cost, profit, total, rate: Number(document.getElementById('app-rate').value)||16, installments: inst, monthly, date: document.getElementById('app-date').value, remaining: total, status: 'active', note: document.getElementById('app-item').value };
+  const data = { id, memberId, memberName: member.name, type: document.getElementById('app-type').value, cost, profit, total, installments: inst, monthly, date: document.getElementById('app-date').value, remaining: total, status: 'active', note: document.getElementById('app-item').value, rate: Number(document.getElementById('app-rate').value)||16 };
   await apiPost('loans', 'add', data);
   const cf = cache.cashflow || [];
   const lastBal = cf.length ? Number(cf[cf.length - 1].balance) : 0;
@@ -1295,7 +1379,7 @@ function printApplyForm() {
   const cost = Number(document.getElementById('app-cost').value);
   if (!memberId || !cost) { showToast('กรุณาเลือกสมาชิกและกรอกราคาทุน', 'err'); return; }
   const member = (cache.members || []).find(m => m.id === memberId);
-  const rate = (Number(document.getElementById('fl-rate').value) || 16) / 100;
+  const rate = (Number(document.getElementById('app-rate').value) || 16) / 100;
   const profit = Math.round(cost * rate), total = cost + profit;
   const inst = Number(document.getElementById('app-inst').value);
   const loan = { id: 'L-NEW', memberId, memberName: member.name, type: document.getElementById('app-type').value, cost, profit, total, installments: inst, monthly: Math.ceil(total/inst), date: document.getElementById('app-date').value };
@@ -1382,6 +1466,233 @@ function loadLocalSeed() {
     localStorage.setItem('nahla_members', JSON.stringify(defaultMembers));
   }
   SHEET_NAMES.forEach(k => { cache[k] = JSON.parse(localStorage.getItem('nahla_' + k) || '[]'); });
+  if (!cache.shares) cache.shares = [];
+}
+
+// ========== MEMBERS STATS + SHARE DISPLAY ==========
+
+function renderMembers() {
+  const q = (document.getElementById('srch-member') || {}).value || '';
+  const list = (cache.members || []).filter(m => !q || m.name.includes(q) || m.id.includes(q));
+  // Stats
+  const allMembers = cache.members || [];
+  const totalShare = allMembers.reduce((s, m) => s + Number(m.share || 0), 0);
+  const sharesData = cache.shares || [];
+  const totalPaid = sharesData.filter(s => s.type !== 'ถอนหุ้น').reduce((s, x) => s + Number(x.amount || 0), 0);
+  const totalWithdrawn = sharesData.filter(s => s.type === 'ถอนหุ้น').reduce((s, x) => s + Number(x.amount || 0), 0);
+  const el = document.getElementById('member-stats');
+  if (el) el.innerHTML = `
+    <div class="stat-card stat-teal"><div class="stat-lbl">สมาชิกทั้งหมด</div><div class="stat-val">${allMembers.length}</div><div class="stat-sub">คน</div></div>
+    <div class="stat-card stat-green"><div class="stat-lbl">เงินหุ้นรวม (ทะเบียน)</div><div class="stat-val" style="font-size:18px">${fmt(totalShare)}</div><div class="stat-sub">บาท</div></div>
+    <div class="stat-card stat-amber"><div class="stat-lbl">ชำระหุ้นสะสม</div><div class="stat-val" style="font-size:18px">${fmt(totalPaid)}</div><div class="stat-sub">บาท</div></div>
+    <div class="stat-card stat-red"><div class="stat-lbl">ถอนหุ้น</div><div class="stat-val" style="font-size:18px">${fmt(totalWithdrawn)}</div><div class="stat-sub">บาท</div></div>`;
+
+  // Table — คำนวณหุ้นสะสมต่อคน
+  const shareByMember = {};
+  sharesData.forEach(s => {
+    if (!shareByMember[s.memberId]) shareByMember[s.memberId] = 0;
+    const amt = Number(s.amount || 0);
+    shareByMember[s.memberId] += s.type === 'ถอนหุ้น' ? -amt : amt;
+  });
+
+  document.getElementById('members-tbody').innerHTML = list.length ? list.map(m => {
+    const accumulated = shareByMember[m.id] || 0;
+    return `<tr>
+      <td class="mono">${m.id}</td><td style="font-weight:500">${m.name}</td>
+      <td style="font-size:12px">${m.phone || '—'}</td>
+      <td style="font-size:12px;color:var(--g5)">${m.addr || '—'}</td>
+      <td style="font-size:12px">${fmtDate(m.joined)}</td>
+      <td class="mono" style="font-weight:600;color:var(--teal)">${fmt(accumulated)}</td>
+      <td class="no-print"><div class="btn-grp">
+        <button class="btn btn-outline btn-xs" onclick='editMember("${m.id}")'>✏ แก้ไข</button>
+        ${ADMIN ? `<button class="btn btn-danger btn-xs" onclick='delMember("${m.id}")'>🗑</button>` : ''}
+      </div></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">ไม่มีข้อมูลสมาชิก</td></tr>';
+}
+
+// ========== SHARES ==========
+
+function renderShares() {
+  const q = (document.getElementById('srch-share') || {}).value || '';
+  const shares = cache.shares || [];
+  const members = cache.members || [];
+
+  // คำนวณ running total ต่อสมาชิก
+  const runMap = {};
+  const list = shares.filter(s => !q || (s.memberName||'').includes(q) || (s.memberId||'').includes(q));
+
+  // Stats
+  const totalIn = shares.filter(s => s.type !== 'ถอนหุ้น').reduce((a, s) => a + Number(s.amount||0), 0);
+  const totalOut = shares.filter(s => s.type === 'ถอนหุ้น').reduce((a, s) => a + Number(s.amount||0), 0);
+  const uniquePayors = new Set(shares.map(s => s.memberId)).size;
+  const el = document.getElementById('share-stats');
+  if (el) el.innerHTML = `
+    <div class="stat-card stat-teal"><div class="stat-lbl">รายการทั้งหมด</div><div class="stat-val">${shares.length}</div><div class="stat-sub">รายการ</div></div>
+    <div class="stat-card stat-green"><div class="stat-lbl">รับหุ้นรวม</div><div class="stat-val" style="font-size:18px">${fmt(totalIn)}</div><div class="stat-sub">บาท</div></div>
+    <div class="stat-card stat-red"><div class="stat-lbl">ถอนหุ้นรวม</div><div class="stat-val" style="font-size:18px">${fmt(totalOut)}</div><div class="stat-sub">บาท</div></div>
+    <div class="stat-card stat-amber"><div class="stat-lbl">สุทธิในมือ</div><div class="stat-val" style="font-size:18px">${fmt(totalIn-totalOut)}</div><div class="stat-sub">บาท</div></div>`;
+
+  // Build cumulative per member
+  const cumMap = {};
+  shares.forEach(s => {
+    if (!cumMap[s.memberId]) cumMap[s.memberId] = 0;
+    cumMap[s.memberId] += s.type === 'ถอนหุ้น' ? -Number(s.amount||0) : Number(s.amount||0);
+  });
+
+  document.getElementById('shares-tbody').innerHTML = list.length ?
+    list.slice().reverse().map(s => `<tr>
+      <td style="font-size:12px">${s.date||'—'}</td>
+      <td class="mono">${s.memberId||'—'}</td>
+      <td style="font-weight:500">${s.memberName||'—'}</td>
+      <td class="mono" style="color:${s.type==='ถอนหุ้น'?'var(--red)':'var(--green)'};font-weight:600">${s.type==='ถอนหุ้น'?'-':''}${fmt(s.amount)}</td>
+      <td class="mono" style="color:var(--teal);font-weight:600">${fmt(cumMap[s.memberId]||0)}</td>
+      <td><span class="badge ${s.type==='ถอนหุ้น'?'b-danger':s.type==='ปันผลหุ้น'?'b-purple':'b-ok'}">${s.type}</span></td>
+      <td style="color:var(--g5)">${s.note||'—'}</td>
+      <td class="no-print">${ADMIN?`<button class="btn btn-danger btn-xs" onclick="delShare('${s.id}')">🗑</button>`:'—'}</td>
+    </tr>`).join('') :
+    '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--g5)">ยังไม่มีรายการหุ้น</td></tr>';
+}
+
+function openShareForm() {
+  document.getElementById('mo-share-title').textContent = 'บันทึกชำระหุ้น';
+  document.getElementById('edit-share-id').value = '';
+  document.getElementById('sf-amount').value = '';
+  document.getElementById('sf-note').value = '';
+  document.getElementById('sf-date').value = today();
+  document.getElementById('sf-type').value = 'ชำระหุ้น';
+  // Populate member select
+  const sel = document.getElementById('sf-member');
+  sel.innerHTML = '<option value="">-- เลือก --</option>' + (cache.members||[]).map(m => `<option value="${m.id}">${m.id} — ${m.name}</option>`).join('');
+  openModal('mo-share');
+}
+
+function fillShareMember() {
+  const id = document.getElementById('sf-member').value;
+  const m = (cache.members||[]).find(x => x.id === id);
+  document.getElementById('sf-name').value = m ? m.name : '';
+}
+
+async function saveShare() {
+  const memberId = document.getElementById('sf-member').value;
+  const member = (cache.members||[]).find(m => m.id === memberId);
+  if (!member) { showToast('กรุณาเลือกสมาชิก','err'); return; }
+  const amount = Number(document.getElementById('sf-amount').value);
+  if (!amount) { showToast('กรุณากรอกจำนวนเงิน','err'); return; }
+  const date = document.getElementById('sf-date').value;
+  const type = document.getElementById('sf-type').value;
+  const note = document.getElementById('sf-note').value;
+  const origId = document.getElementById('edit-share-id').value;
+  setBtn('save-share-btn', true);
+  try {
+    if (origId) {
+      await apiPost('shares', 'update', { memberId, memberName: member.name, amount, date, type, note }, origId);
+      showToast('แก้ไขแล้ว ✓');
+    } else {
+      const id = genId('SH', cache.shares||[]);
+      await apiPost('shares', 'add', { id, memberId, memberName: member.name, amount, date, type, note });
+      // Update member share total in members sheet
+      const newShare = Number(member.share||0) + (type==='ถอนหุ้น'?-amount:amount);
+      await apiPost('members','update',{ share: Math.max(0, newShare) }, memberId);
+      cache.members = await apiGet('members');
+      showToast('บันทึกหุ้นแล้ว ✓');
+    }
+    closeModal('mo-share');
+    cache.shares = await apiGet('shares');
+    renderShares(); renderMembers();
+  } catch(e) { showToast('บันทึกไม่สำเร็จ','err'); }
+  setBtn('save-share-btn', false);
+}
+
+async function delShare(id) {
+  if (!ADMIN) { showToast('ต้องอยู่ใน Admin Mode','err'); return; }
+  const ok = await confirm2('ลบรายการหุ้นนี้?');
+  if (!ok) return;
+  await apiPost('shares','delete',null,id);
+  cache.shares = await apiGet('shares');
+  renderShares(); renderMembers();
+  showToast('ลบแล้ว');
+}
+
+// ========== REPORT ==========
+
+function renderReport() {
+  const type = (document.getElementById('rpt-type')||{}).value || 'monthly';
+  const cf = cache.cashflow || [];
+  const loans = cache.loans || [];
+
+  // Build year options from cashflow
+  const years = [...new Set(cf.map(r => r.date ? r.date.slice(0,4) : null).filter(Boolean))].sort().reverse();
+  const yearSel = document.getElementById('rpt-year');
+  const curYear = yearSel.value || years[0] || new Date().getFullYear().toString();
+  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y===curYear?'selected':''}>${y}</option>`).join('');
+
+  const monthSel = document.getElementById('rpt-month');
+  monthSel.style.display = type === 'monthly' ? '' : 'none';
+  const thMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const curMonth = monthSel.value || String(new Date().getMonth()+1).padStart(2,'0');
+  monthSel.innerHTML = thMonths.map((n,i) => { const v = String(i+1).padStart(2,'0'); return `<option value="${v}" ${v===curMonth?'selected':''}>${n}</option>`; }).join('');
+
+  // Filter cashflow
+  const filtered = cf.filter(r => {
+    if (!r.date) return false;
+    const y = r.date.slice(0,4), m = r.date.slice(5,7);
+    if (type === 'yearly') return y === curYear;
+    return y === curYear && m === curMonth;
+  });
+
+  const income = filtered.filter(r => r.type === 'income');
+  const expense = filtered.filter(r => r.type === 'expense');
+  const totalIn = income.reduce((s,r) => s + Number(r.amount||0), 0);
+  const totalEx = expense.reduce((s,r) => s + Number(r.amount||0), 0);
+  const profit = totalIn - totalEx;
+
+  // Filter loans created in period
+  const loansInPeriod = loans.filter(l => {
+    if (!l.date) return false;
+    const y = l.date.slice(0,4), m = l.date.slice(5,7);
+    if (type === 'yearly') return y === curYear;
+    return y === curYear && (document.getElementById('rpt-month').value||curMonth) === m;
+  });
+  const totalLoanCost = loansInPeriod.reduce((s,l) => s + Number(l.cost||0), 0);
+  const totalLoanProfit = loansInPeriod.reduce((s,l) => s + Number(l.profit||0), 0);
+
+  // Period label
+  const periodLabel = type === 'yearly' ? `ปี ${curYear}` :
+    `${thMonths[Number(curMonth)-1]} ${curYear}`;
+
+  // Summary cards
+  document.getElementById('rpt-summary').innerHTML = `
+    <div class="stat-card stat-green"><div class="stat-lbl">รายรับ</div><div class="stat-val" style="font-size:18px">${fmt(totalIn)}</div><div class="stat-sub">${periodLabel}</div></div>
+    <div class="stat-card stat-red"><div class="stat-lbl">รายจ่าย</div><div class="stat-val" style="font-size:18px">${fmt(totalEx)}</div><div class="stat-sub">${periodLabel}</div></div>
+    <div class="stat-card ${profit>=0?'stat-teal':'stat-amber'}"><div class="stat-lbl">กำไรสุทธิ</div><div class="stat-val" style="font-size:18px">${fmt(profit)}</div><div class="stat-sub">${profit>=0?'กำไร':'ขาดทุน'}</div></div>
+    <div class="stat-card"><div class="stat-lbl">ปล่อยสินเชื่อใหม่</div><div class="stat-val" style="font-size:18px">${fmt(totalLoanCost)}</div><div class="stat-sub">กำไร ${fmt(totalLoanProfit)} บาท</div></div>`;
+
+  // Income table
+  document.getElementById('rpt-income-tbody').innerHTML = income.length ?
+    income.map(r => `<tr><td style="font-size:12px">${r.date}</td><td>${r.desc}</td><td class="mono" style="text-align:right;color:var(--green);font-weight:600">${fmt(r.amount)}</td></tr>`).join('')
+    + `<tr style="background:var(--green-l)"><td colspan="2" style="font-weight:700;padding:8px 14px">รวม</td><td class="mono" style="text-align:right;font-weight:700;color:var(--green);padding:8px 14px">${fmt(totalIn)}</td></tr>`
+    : '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--g5)">ไม่มีรายรับ</td></tr>';
+  document.getElementById('rpt-income-total').textContent = fmt(totalIn) + ' บาท';
+
+  // Expense table
+  document.getElementById('rpt-expense-tbody').innerHTML = expense.length ?
+    expense.map(r => `<tr><td style="font-size:12px">${r.date}</td><td>${r.desc}</td><td class="mono" style="text-align:right;color:var(--red);font-weight:600">${fmt(r.amount)}</td></tr>`).join('')
+    + `<tr style="background:var(--red-l)"><td colspan="2" style="font-weight:700;padding:8px 14px">รวม</td><td class="mono" style="text-align:right;font-weight:700;color:var(--red);padding:8px 14px">${fmt(totalEx)}</td></tr>`
+    : '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--g5)">ไม่มีรายจ่าย</td></tr>';
+  document.getElementById('rpt-expense-total').textContent = fmt(totalEx) + ' บาท';
+
+  // Loans table
+  document.getElementById('rpt-loans-tbody').innerHTML = loansInPeriod.length ?
+    loansInPeriod.map(l => `<tr>
+      <td class="mono" style="color:var(--teal)">${l.id}</td>
+      <td style="font-weight:500">${l.memberName}</td>
+      <td class="mono">${fmt(l.cost)}</td>
+      <td class="mono" style="color:var(--amber)">${fmt(l.profit)}</td>
+      <td class="mono">${l.rate||16}%</td>
+      <td><span class="badge ${l.status==='active'?'b-info':'b-ok'}">${l.status==='active'?'กำลังผ่อน':'ปิดแล้ว'}</span></td>
+    </tr>`).join('')
+    : '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--g5)">ไม่มีสินเชื่อในช่วงนี้</td></tr>';
 }
 
 // ========== CLOCK ==========
