@@ -2,8 +2,11 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>กลุ่มออมทรัพย์นะห์ลา — Realtime</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#4E342E">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -20,7 +23,7 @@
   /* Bee palette extras */
   --bee-yellow:#FFD600;--bee-gold:#F9A825;--bee-dark:#4E342E;--bee-stripe:#1A1A1A;
 }
-body{font-family:var(--font);background:#FFF8E7;color:var(--g9);display:flex;min-height:100vh;font-size:15px}
+body{font-family:var(--font);background:#FFF8E7;color:var(--g9);display:flex;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased}
 
 /* Sidebar */
 #sidebar{width:var(--sw);min-height:100vh;background:linear-gradient(180deg,#4E342E 0%,#3E2723 60%,#2C1810 100%);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
@@ -50,7 +53,7 @@ body{font-family:var(--font);background:#FFF8E7;color:var(--g9);display:flex;min
 .topbar{background:var(--white);border-bottom:3px solid #FFD600;padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .topbar-title{font-size:16px;font-weight:600}
 .topbar-actions{display:flex;gap:8px;align-items:center}
-.content{padding:22px 26px;flex:1}
+.content{padding:22px 26px;flex:1;overflow-x:hidden}
 
 /* Stats */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
@@ -92,13 +95,13 @@ body{font-family:var(--font);background:#FFF8E7;color:var(--g9);display:flex;min
 .btn-grp{display:flex;gap:5px;flex-wrap:wrap}
 
 /* Forms */
-.fg{display:grid;gap:14px}.fg2{grid-template-columns:1fr 1fr}.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg{display:grid;gap:14px}.fg2{grid-template-columns:1fr 1fr}.fg3{grid-template-columns:repeat(3,1fr)}
 .form-group label{display:block;font-size:12px;font-weight:600;color:var(--g7);margin-bottom:5px}
 .form-control{width:100%;padding:8px 12px;border:1px solid var(--g3);border-radius:8px;font-size:14px;font-family:var(--font);color:var(--g9);background:var(--white);transition:border .15s}
 .form-control:focus{outline:none;border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
 .form-control:read-only{background:var(--g0)}
 select.form-control{cursor:pointer}
-.form-row{display:flex;gap:14px;margin-bottom:14px}.form-row .form-group{flex:1}
+.form-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}.form-row .form-group{flex:1;min-width:200px}
 
 /* Modal */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -106,6 +109,8 @@ select.form-control{cursor:pointer}
 .mo-box{background:var(--white);border-radius:16px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.25)}
 .mo-box.wide{width:680px}
 .mo-hd{padding:16px 22px 12px;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1}
+.mo-hd::before{content:"";display:none;width:36px;height:4px;background:var(--g3);border-radius:2px;margin:0 auto 8px;position:absolute;top:8px;left:50%;transform:translateX(-50%)}
+@media(max-width:768px){.mo-hd::before{display:block}}
 .mo-title{font-size:16px;font-weight:700}
 .mo-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--g5);padding:0 4px}
 .mo-body{padding:20px 22px}
@@ -113,7 +118,7 @@ select.form-control{cursor:pointer}
 
 /* Pages */
 .page{display:none}.page.active{display:block}
-.page-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+.page-bar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:8px;flex-wrap:wrap}
 
 /* Alert */
 .alert{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;border:1px solid transparent}
@@ -198,12 +203,156 @@ select.form-control{cursor:pointer}
 .pf-sig-line{border-top:1.5pt solid #999;padding-top:4pt;font-size:9.5pt;color:#444;margin-top:22pt}
 .pf-stamp{border:2pt dashed #0F6E56;border-radius:6pt;width:70pt;height:50pt;display:flex;align-items:center;justify-content:center;font-size:9pt;color:#0F6E56;margin:0 auto;text-align:center}
 .pf-footer{border-top:2pt solid #F9A825;margin-top:8mm;padding-top:4pt;display:flex;justify-content:space-between;font-size:9pt;color:#666}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE / MOBILE — กลุ่มนะห์ลา
+   ══════════════════════════════════════════════════ */
+
+/* Hamburger button */
+#menu-btn{display:none;position:fixed;top:10px;left:12px;z-index:300;background:#4E342E;border:none;border-radius:8px;padding:8px 10px;cursor:pointer;flex-direction:column;gap:4px}
+#menu-btn span{display:block;width:20px;height:2px;background:#FFD600;border-radius:2px;transition:all .25s}
+#menu-btn.open span:nth-child(1){transform:rotate(45deg) translate(4px,4px)}
+#menu-btn.open span:nth-child(2){opacity:0}
+#menu-btn.open span:nth-child(3){transform:rotate(-45deg) translate(4px,-4px)}
+
+/* Sidebar overlay for mobile */
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+
+/* Table scroll wrapper */
+.tbl-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-wrap .tbl{min-width:600px}
+
+/* Card body default padding */
+.card-body-pad{padding:14px 16px}
+
+/* Mobile bottom nav */
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#4E342E;z-index:150;padding:6px 0 env(safe-area-inset-bottom,6px);border-top:2px solid #FFD600}
+.mob-nav-items{display:flex;justify-content:space-around;align-items:center}
+.mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:10px;font-family:var(--font);border:none;background:none;min-width:52px;transition:color .15s}
+.mob-nav-item.active{color:#FFD600}
+.mob-nav-item svg{width:20px;height:20px}
+.mob-nav-more{position:relative}
+#mob-more-menu{display:none;position:fixed;bottom:68px;left:0;right:0;background:#3E2723;border-top:1px solid #FFD600;padding:8px 0;z-index:200;max-height:60vh;overflow-y:auto}
+#mob-more-menu.open{display:block}
+.mob-more-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:rgba(255,255,255,.8);font-size:14px;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);text-align:left}
+.mob-more-item:hover,.mob-more-item.active{background:rgba(255,214,0,.15);color:#FFD600}
+.mob-more-item svg{width:18px;height:18px;flex-shrink:0;opacity:.8}
+
+@media (max-width: 768px) {
+  /* Show hamburger & mobile nav */
+  #menu-btn{display:flex}
+  #mobile-nav{display:block}
+
+  /* Sidebar off-canvas */
+  #sidebar{transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:200}
+  #sidebar.mobile-open{transform:translateX(0)}
+  #sidebar-overlay.open{display:block}
+
+  /* Main full width */
+  #main{margin-left:0!important;padding-bottom:70px}
+  #admin-bar{padding:5px 14px}
+
+  /* Topbar */
+  .topbar{padding:0 14px 0 54px;height:50px}
+  .topbar-title{font-size:14px}
+  .topbar-actions{gap:4px}
+  .topbar-actions #sync-btn{display:none}
+
+  /* Content */
+  .content{padding:14px 12px}
+
+  /* Stats — 2 columns on mobile */
+  .stat-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+  #member-stats,#share-stats,#rpt-summary{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+
+  /* Cards */
+  .card{border-radius:10px;margin-bottom:12px}
+  .card-header{padding:11px 14px;flex-wrap:wrap;gap:8px}
+  .card-title{font-size:13px}
+
+  /* Tables — horizontal scroll */
+  .card > div[style*="padding:0"]{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tbl{min-width:520px}
+  .tbl th,.tbl td{padding:7px 10px;font-size:12px;white-space:nowrap}
+
+  /* Page bar */
+  .page-bar{gap:8px}
+  .page-bar > div{flex-wrap:wrap}
+  .btn-grp{flex-wrap:wrap;gap:4px}
+
+  /* Buttons smaller */
+  .btn{padding:6px 11px;font-size:12px}
+  .btn-sm{padding:4px 9px;font-size:11px}
+  .btn-xs{padding:3px 6px;font-size:10px}
+
+  /* Search input full width */
+  .srch input{width:100%!important}
+  .srch{width:100%}
+
+  /* Dashboard two col grid */
+  #page-dashboard > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+
+  /* Modal */
+  .mo-box{width:96vw!important;max-height:88vh;border-radius:12px}
+  .mo-body{padding:16px}
+  .mo-hd{padding:14px 16px 10px}
+  .mo-ft{padding:10px 16px}
+
+  /* Form rows stack on mobile */
+  .form-row{flex-direction:column;gap:10px}
+  .fg2{grid-template-columns:1fr!important}
+  .fg3{grid-template-columns:1fr!important}
+
+  /* Apply form */
+  #page-apply .card{max-width:100%!important}
+
+  /* Notes grid 1 col on mobile */
+  #notes-grid{grid-template-columns:1fr!important}
+
+  /* Report two col → one col */
+  #page-report > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+
+  /* Loans in report summary */
+  #rpt-summary{grid-template-columns:repeat(2,1fr)!important}
+
+  /* Stat card values smaller */
+  .stat-val{font-size:20px}
+
+  /* Hide less important table columns on small screen */
+  .hide-mobile{display:none!important}
+
+  /* NPL alert */
+  #npl-alert{font-size:12px}
+
+  /* Sync status wrap */
+  .sync-label{font-size:10px}
+
+  /* Page title */
+  #page-title{font-size:14px}
+}
+
+@media (max-width: 480px) {
+  .stat-val{font-size:17px}
+  .stat-lbl{font-size:10px}
+  .content{padding:10px 8px}
+  .tbl th,.tbl td{padding:6px 8px;font-size:11px}
+  .btn{padding:5px 9px;font-size:11px}
+  .topbar{padding:0 10px 0 52px}
+}
 </style>
 </head>
 <body>
 
 <!-- PRINT AREA -->
 <div id="print-area"></div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Hamburger button (mobile) -->
+<button id="menu-btn" onclick="toggleMobileSidebar()" aria-label="เมนู">
+  <span></span><span></span><span></span>
+</button>
 
 <!-- SETUP SCREEN -->
 <div id="setup">
@@ -284,7 +433,7 @@ select.form-control{cursor:pointer}
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="stat-grid" id="stat-grid"><div class="stat-card" style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g5)">กำลังโหลดข้อมูล...</div></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
         <div class="card"><div class="card-header"><span class="card-title">สินเชื่อที่กำลังผ่อน</span></div><div style="padding:0"><table class="tbl"><thead><tr><th>ชื่อ</th><th>คงค้าง</th><th>สถานะ</th></tr></thead><tbody id="dash-loans"><tr><td colspan="3" style="text-align:center;color:var(--g5);padding:20px">กำลังโหลด...</td></tr></tbody></table></div></div>
         <div class="card"><div class="card-header"><span class="card-title">หนี้ค้างเกิน 1 ปี</span></div><div style="padding:0"><table class="tbl"><thead><tr><th>ชื่อ</th><th>ค้าง (บาท)</th><th>ประเภท</th></tr></thead><tbody id="dash-npl"><tr><td colspan="3" style="text-align:center;color:var(--g5);padding:20px">กำลังโหลด...</td></tr></tbody></table></div></div>
       </div>
@@ -292,7 +441,7 @@ select.form-control{cursor:pointer}
 
     <!-- MEMBERS -->
     <div class="page" id="page-members">
-      <div id="member-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px"></div>
+      <div id="member-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px"></div>
       <div class="page-bar">
         <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-member" placeholder="ค้นหา..." oninput="renderMembers()"></div>
         <div class="btn-grp no-print">
@@ -305,7 +454,7 @@ select.form-control{cursor:pointer}
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์</th><th>ที่อยู่</th><th>วันเข้า</th><th>หุ้น (บาท)</th><th class="no-print">จัดการ</th></tr></thead><tbody id="members-tbody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+        <table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์</th><th class="hide-mobile">ที่อยู่</th><th class="hide-mobile">วันเข้า</th><th>หุ้น (บาท)</th><th class="no-print">จัดการ</th></tr></thead><tbody id="members-tbody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
       </div></div>
     </div>
 
@@ -320,7 +469,7 @@ select.form-control{cursor:pointer}
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th>ราคาทุน</th><th>กำไร</th><th>ราคาขาย</th><th>งวด</th><th>คงค้าง</th><th>ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
+        <table class="tbl"><thead><tr><th>รหัส</th><th>สมาชิก</th><th class="hide-mobile">ราคาทุน</th><th class="hide-mobile">กำไร</th><th>ราคาขาย</th><th class="hide-mobile">งวด</th><th>คงค้าง</th><th class="hide-mobile">ประเภท</th><th>สถานะ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="loans-tbody"><tr><td colspan="10" style="text-align:center;padding:30px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
       </div></div>
     </div>
 
@@ -334,7 +483,7 @@ select.form-control{cursor:pointer}
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl"><thead><tr><th>วันที่</th><th>สมาชิก</th><th>รหัสสัญญา</th><th>งวดที่</th><th>จำนวนเงิน</th><th>หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="payments-tbody"></tbody></table>
+        <table class="tbl"><thead><tr><th>วันที่</th><th>สมาชิก</th><th class="hide-mobile">รหัสสัญญา</th><th class="hide-mobile">งวดที่</th><th>จำนวนเงิน</th><th class="hide-mobile">หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="payments-tbody"></tbody></table>
       </div></div>
     </div>
 
@@ -348,7 +497,7 @@ select.form-control{cursor:pointer}
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl" id="cf-table"><thead><tr><th>วันที่</th><th>รายการ</th><th>ประเภท</th><th>รายรับ</th><th>รายจ่าย</th><th>คงเหลือ</th><th class="no-print">จัดการ</th></tr></thead><tbody></tbody></table>
+        <table class="tbl" id="cf-table"><thead><tr><th>วันที่</th><th>รายการ</th><th class="hide-mobile">ประเภท</th><th>รายรับ</th><th>รายจ่าย</th><th>คงเหลือ</th><th class="no-print hide-mobile">จัดการ</th></tr></thead><tbody></tbody></table>
       </div></div>
       <div class="cf-sum" id="cf-sum" style="display:none"><div style="font-size:13px;color:var(--teal);font-weight:500" id="cf-sum-txt"></div><div style="font-size:22px;font-weight:700;color:var(--teal-d);font-family:var(--mono)" id="cf-sum-val"></div></div>
     </div>
@@ -360,7 +509,7 @@ select.form-control{cursor:pointer}
         <div class="card-header"><span class="card-title">หนี้ค้างเกิน 1 ปี</span>
           <div class="btn-grp no-print"><button class="btn btn-primary btn-sm" onclick="openNplForm()">+ เพิ่มรายการ</button><button class="btn btn-purple btn-sm" onclick="printNplSummary()">🖨 พิมพ์สรุปหนี้</button><button class="btn btn-outline btn-sm" onclick="refreshPage('npl')">↻</button></div>
         </div>
-        <div style="padding:0"><table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์</th><th>คงค้าง</th><th>ประเภท</th><th>หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="npl-tbody"></tbody></table></div>
+        <div style="padding:0"><table class="tbl"><thead><tr><th class="hide-mobile">รหัส</th><th>ชื่อ-สกุล</th><th class="hide-mobile">เบอร์</th><th>คงค้าง</th><th>ประเภท</th><th class="hide-mobile">หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead><tbody id="npl-tbody"></tbody></table></div>
       </div>
     </div>
 
@@ -415,7 +564,7 @@ select.form-control{cursor:pointer}
 
     <!-- ===== SHARES (หุ้น) ===== -->
     <div class="page" id="page-shares">
-      <div id="share-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px"></div>
+      <div id="share-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px"></div>
       <div class="page-bar">
         <div class="srch"><span class="srch-ic">🔍</span><input class="form-control" id="srch-share" placeholder="ค้นหาชื่อ..." oninput="renderShares()"></div>
         <div class="btn-grp no-print">
@@ -426,7 +575,7 @@ select.form-control{cursor:pointer}
         </div>
       </div>
       <div class="card"><div style="padding:0">
-        <table class="tbl"><thead><tr><th>วันที่</th><th>รหัส</th><th>ชื่อ-สกุล</th><th>จำนวน (บาท)</th><th>สะสมรวม</th><th>ประเภท</th><th>หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead>
+        <table class="tbl"><thead><tr><th>วันที่</th><th class="hide-mobile">รหัส</th><th>ชื่อ-สกุล</th><th>จำนวน (บาท)</th><th class="hide-mobile">สะสมรวม</th><th>ประเภท</th><th class="hide-mobile">หมายเหตุ</th><th class="no-print">จัดการ</th></tr></thead>
         <tbody id="shares-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--g5)">กำลังโหลด...</td></tr></tbody></table>
       </div></div>
     </div>
@@ -450,7 +599,7 @@ select.form-control{cursor:pointer}
           <button class="btn btn-purple btn-sm" onclick="printNotes()">🖨 พิมพ์</button>
         </div>
       </div>
-      <div id="notes-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px"></div>
+      <div id="notes-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:16px"></div>
     </div>
 
     <!-- ===== REPORT (สรุปรายเดือน/ปี) ===== -->
@@ -466,7 +615,7 @@ select.form-control{cursor:pointer}
         </div>
         <button class="btn btn-purple btn-sm no-print" onclick="printReport()">🖨 พิมพ์รายงาน A4</button>
       </div>
-      <div id="rpt-summary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px"></div>
+      <div id="rpt-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="card">
           <div class="card-header"><span class="card-title">รายรับ</span><span id="rpt-income-total" style="font-size:13px;font-weight:700;color:var(--green)"></span></div>
@@ -649,6 +798,47 @@ select.form-control{cursor:pointer}
 <div id="cdlg"><div id="cbox"><div id="cmsg"></div><div id="cacts"><button class="btn btn-outline" onclick="cResolve(false)">ยกเลิก</button><button class="btn btn-danger" id="cok" onclick="cResolve(true)">ยืนยัน</button></div></div></div>
 
 <div id="toast"></div>
+
+<!-- Mobile Bottom Navigation -->
+<nav id="mobile-nav">
+  <div class="mob-nav-items">
+    <button class="mob-nav-item active" data-page="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>หน้าหลัก
+    </button>
+    <button class="mob-nav-item" data-page="members">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>สมาชิก
+    </button>
+    <button class="mob-nav-item" data-page="loans">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>สินเชื่อ
+    </button>
+    <button class="mob-nav-item" data-page="payments">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>ชำระ
+    </button>
+    <button class="mob-nav-item mob-nav-more" onclick="toggleMoreMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>เพิ่มเติม
+    </button>
+  </div>
+  <div id="mob-more-menu">
+    <button class="mob-more-item" data-page="cashflow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>รายรับ-จ่าย
+    </button>
+    <button class="mob-more-item" data-page="npl">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>หนี้ค้าง / NPL
+    </button>
+    <button class="mob-more-item" data-page="shares">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>จัดการหุ้น
+    </button>
+    <button class="mob-more-item" data-page="report">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h4"/></svg>สรุปรายเดือน/ปี
+    </button>
+    <button class="mob-more-item" data-page="notes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>โน้ต/บันทึก
+    </button>
+    <button class="mob-more-item" data-page="apply">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>แบบขอสินเชื่อ
+    </button>
+  </div>
+</nav>
 
 <script>
 'use strict';
@@ -996,12 +1186,12 @@ function renderLoans() {
     <tr>
       <td class="mono" style="font-weight:600;color:var(--teal)">${l.id}</td>
       <td style="font-weight:500">${l.memberName}</td>
-      <td class="mono">${fmt(l.cost)}</td>
-      <td class="mono" style="color:var(--amber)">${fmt(l.profit)}</td>
+      <td class="mono hide-mobile">${fmt(l.cost)}</td>
+      <td class="mono hide-mobile" style="color:var(--amber)">${fmt(l.profit)}</td>
       <td class="mono" style="font-weight:700;color:var(--teal-d)">${fmt(l.total)}</td>
-      <td>${l.installments}</td>
+      <td class="hide-mobile">${l.installments}</td>
       <td class="mono" style="color:${Number(l.remaining)>0?'var(--red)':'var(--green)'};font-weight:600">${fmt(l.remaining)}</td>
-      <td><span class="badge b-warn">${l.type}</span></td>
+      <td class="hide-mobile"><span class="badge b-warn">${l.type}</span></td>
       <td><span class="badge ${l.status==='active'?'b-info':'b-ok'}">${l.status==='active'?'กำลังผ่อน':'ปิดแล้ว'}</span></td>
       <td class="no-print"><div class="btn-grp">
         <button class="btn btn-outline btn-xs" onclick='showLoanDetail("${l.id}")'>ดู</button>
@@ -1572,8 +1762,8 @@ function renderMembers() {
     return `<tr>
       <td class="mono">${m.id}</td><td style="font-weight:500">${m.name}</td>
       <td style="font-size:12px">${m.phone || '—'}</td>
-      <td style="font-size:12px;color:var(--g5)">${m.addr || '—'}</td>
-      <td style="font-size:12px">${fmtDate(m.joined)}</td>
+      <td class="hide-mobile" style="font-size:12px;color:var(--g5)">${m.addr || '—'}</td>
+      <td class="hide-mobile" style="font-size:12px">${fmtDate(m.joined)}</td>
       <td class="mono" style="font-weight:600;color:var(--teal)">${fmt(accumulated)}</td>
       <td class="no-print"><div class="btn-grp">
         <button class="btn btn-purple btn-xs" onclick='printMemberDetail("${m.id}")'>🖨</button>
@@ -1793,7 +1983,10 @@ function openPrintWindow(html) {
   win.document.write(`<!DOCTYPE html><html lang="th"><head>
   <meta charset="UTF-8">
   <title>กลุ่มออมทรัพย์นะห์ลา</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#4E342E">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Sarabun',sans-serif;background:#fff;color:#111;font-size:13pt}
@@ -2604,6 +2797,130 @@ function editShare(id) {
   document.getElementById('sf-note').value = s.note||'';
   openModal('mo-share');
 }
+
+
+// ╔══════════════════════════════════════════════════╗
+// ║           MOBILE / RESPONSIVE JS                 ║
+// ╚══════════════════════════════════════════════════╝
+
+function isMobile() { return window.innerWidth <= 768; }
+
+function toggleMobileSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const btn = document.getElementById('menu-btn');
+  const isOpen = sb.classList.contains('mobile-open');
+  sb.classList.toggle('mobile-open', !isOpen);
+  ov.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  // Close more menu when sidebar opens
+  if (!isOpen) closeMobileMore();
+}
+
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.getElementById('menu-btn').classList.remove('open');
+}
+
+function toggleMoreMenu() {
+  const m = document.getElementById('mob-more-menu');
+  m.classList.toggle('open');
+}
+
+function closeMobileMore() {
+  document.getElementById('mob-more-menu').classList.remove('open');
+}
+
+// Close more menu when clicking outside
+document.addEventListener('click', e => {
+  const more = document.getElementById('mob-more-menu');
+  const moreBtn = document.querySelector('.mob-nav-more');
+  if (more && more.classList.contains('open') && !more.contains(e.target) && !moreBtn?.contains(e.target)) {
+    more.classList.remove('open');
+  }
+});
+
+// Mobile nav item click handlers
+document.querySelectorAll('.mob-nav-item[data-page]').forEach(el => {
+  el.addEventListener('click', () => {
+    const pg = el.dataset.page;
+    // Update active state on mobile nav
+    document.querySelectorAll('.mob-nav-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    // Trigger page navigation (reuse existing nav system)
+    navigateTo(pg);
+    closeMobileMore();
+  });
+});
+
+document.querySelectorAll('.mob-more-item[data-page]').forEach(el => {
+  el.addEventListener('click', () => {
+    const pg = el.dataset.page;
+    // Update active on more items
+    document.querySelectorAll('.mob-more-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    // Update bottom nav — show "เพิ่มเติม" as active
+    document.querySelectorAll('.mob-nav-item').forEach(x => x.classList.remove('active'));
+    document.querySelector('.mob-nav-more')?.classList.add('active');
+    navigateTo(pg);
+    closeMobileMore();
+  });
+});
+
+// Centralized navigate function (reuse sidebar nav logic)
+function navigateTo(pg) {
+  // Sync desktop sidebar
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  const sidebarItem = document.querySelector(`.nav-item[data-page="${pg}"]`);
+  if (sidebarItem) sidebarItem.classList.add('active');
+  // Show page
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + pg);
+  if (pageEl) pageEl.classList.add('active');
+  // Update topbar title
+  document.getElementById('page-title').textContent = PAGE_TITLES[pg] || pg;
+  currentPage = pg;
+  renderPage(pg);
+  // Close sidebar on mobile
+  if (isMobile()) closeMobileSidebar();
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Sync sidebar nav items with navigateTo
+document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+  // Remove old click handler and replace
+  const newEl = el.cloneNode(true);
+  el.parentNode.replaceChild(newEl, el);
+  newEl.addEventListener('click', () => {
+    const pg = newEl.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    newEl.classList.add('active');
+    navigateTo(pg);
+    // Sync mobile nav active
+    document.querySelectorAll('.mob-nav-item,.mob-more-item').forEach(x => x.classList.remove('active'));
+    const mobItem = document.querySelector(`.mob-nav-item[data-page="${pg}"]`) || document.querySelector(`.mob-more-item[data-page="${pg}"]`);
+    if (mobItem) {
+      mobItem.classList.add('active');
+      if (mobItem.classList.contains('mob-more-item')) {
+        document.querySelector('.mob-nav-more')?.classList.add('active');
+      }
+    }
+  });
+});
+
+// Handle window resize
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (!isMobile()) {
+      closeMobileSidebar();
+      closeMobileMore();
+    }
+  }, 200);
+});
 
 // ========== CLOCK ==========
 function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('th-TH', { year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit' }); }
