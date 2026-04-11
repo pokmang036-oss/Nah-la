@@ -9,3 +9,5 @@ Apps Script Web App URL  :  [https://script.google.com/macros/s/AKfycbxEhMbYuPBN
 5. Execute as: Me · Access: Anyone
 6. Copy URL → วางด้านบน
 ⚠ ต้อง Deploy ใหม่ทุกครั้งที่แก้โค้ด
+
+ทดสอบ
