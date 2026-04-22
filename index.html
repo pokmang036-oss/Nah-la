@@ -408,6 +408,7 @@ select.form-control{cursor:pointer}
     <div class="nav-item" data-page="notes"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>โน้ต/บันทึก</div>
     <div class="nav-sec">เอกสาร</div>
     <div class="nav-item" data-page="apply"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>แบบขอสินเชื่อ</div>
+    <div class="nav-item" data-page="receipt"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>พิมพ์ใบเสร็จ</div>
   </div>
   <div class="sidebar-bot">
     <div class="admin-badge" onclick="toggleAdmin()" id="admin-btn">🔐 Admin Mode</div>
@@ -727,6 +728,133 @@ select.form-control{cursor:pointer}
   </div>
 </div>
 
+    <!-- ===== RECEIPT PAGE ===== -->
+    <div class="page" id="page-receipt">
+      <div style="max-width:720px;margin:0 auto">
+
+        <!-- Header card -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">
+            <span class="card-title">🧾 สร้างใบเสร็จรับเงิน</span>
+            <div class="btn-grp no-print">
+              <button class="btn btn-primary" onclick="printReceipt()">🖨 พิมพ์ A4</button>
+              <button class="btn btn-warn btn-sm" onclick="clearReceipt()">🗑 ล้างฟอร์ม</button>
+            </div>
+          </div>
+          <div style="padding:18px 20px">
+
+            <!-- ส่วนที่ 1: ข้อมูลใบเสร็จ -->
+            <div style="font-size:12px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">ข้อมูลใบเสร็จ</div>
+            <div class="form-row" style="margin-bottom:14px">
+              <div class="form-group">
+                <label>เลขที่ใบเสร็จ</label>
+                <input class="form-control" id="rc-no" placeholder="เช่น RCP-001">
+              </div>
+              <div class="form-group">
+                <label>วันที่</label>
+                <input type="date" class="form-control" id="rc-date">
+              </div>
+              <div class="form-group">
+                <label>ประเภทใบเสร็จ</label>
+                <select class="form-control" id="rc-type">
+                  <option value="receipt">ใบเสร็จรับเงิน</option>
+                  <option value="invoice">ใบแจ้งหนี้</option>
+                  <option value="payment">หลักฐานการชำระ</option>
+                </select>
+              </div>
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--g1);margin:14px 0">
+
+            <!-- ส่วนที่ 2: ข้อมูลผู้รับ -->
+            <div style="font-size:12px;font-weight:700;color:var(--teal-d);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">ข้อมูลผู้ชำระ</div>
+            <div class="form-row" style="margin-bottom:14px">
+              <div class="form-group" style="flex:2">
+                <label>ชื่อ-สกุล ผู้ชำระ</label>
+                <div style="display:flex;gap:8px">
+                  <input class="form-control" id="rc-payer" placeholder="กรอกชื่อ หรือเลือกจากสมาชิก">
+                  <select class="form-control" id="rc-payer-sel" onchange="fillReceiptPayer()" style="width:180px;flex-shrink:0">
+                    <option value="">— เลือกสมาชิก —</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:0">
+              <div class="form-group">
+                <label>ที่อยู่ / ที่ติดต่อ</label>
+                <input class="form-control" id="rc-addr" placeholder="บ้านเลขที่ หมู่ ตำบล อำเภอ จังหวัด">
+              </div>
+              <div class="form-group">
+                <label>เบอร์โทร</label>
+                <input class="form-control" id="rc-phone" placeholder="0XX-XXXXXXX">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- รายการสินค้า/บริการ -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">
+            <span class="card-title">รายการ</span>
+            <button class="btn btn-primary btn-sm no-print" onclick="addReceiptItem()">+ เพิ่มรายการ</button>
+          </div>
+          <div style="padding:0;overflow-x:auto">
+            <table class="tbl" id="rc-items-table" style="min-width:500px">
+              <thead>
+                <tr>
+                  <th style="width:32px">#</th>
+                  <th>รายการ / คำอธิบาย</th>
+                  <th style="width:80px">จำนวน</th>
+                  <th style="width:100px">ราคา/หน่วย (บาท)</th>
+                  <th style="width:110px">รวม (บาท)</th>
+                  <th class="no-print" style="width:50px"></th>
+                </tr>
+              </thead>
+              <tbody id="rc-items-body">
+                <!-- rows injected by JS -->
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4" style="text-align:right;font-weight:600;padding:10px 14px;border-top:2px solid var(--g3)">ยอดรวมทั้งสิ้น</td>
+                  <td id="rc-grand-total" style="font-weight:700;font-size:16px;color:var(--teal);font-family:var(--mono);padding:10px 14px;border-top:2px solid var(--g3)">0</td>
+                  <td class="no-print" style="border-top:2px solid var(--g3)"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- ส่วนที่ 3: ข้อมูลเพิ่มเติม -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">ข้อมูลเพิ่มเติม</span></div>
+          <div style="padding:18px 20px">
+            <div class="form-row" style="margin-bottom:14px">
+              <div class="form-group">
+                <label>วิธีชำระเงิน</label>
+                <select class="form-control" id="rc-pay-method">
+                  <option value="โอนบัญชี">โอนบัญชี กรุงไทย</option>
+                  <option value="PromptPay">PromptPay 098-679-7379</option>
+                  <option value="เงินสด">เงินสด</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>หมายเหตุ</label>
+                <input class="form-control" id="rc-note" placeholder="เช่น ชำระงวดที่ 3 สัญญา L-001">
+              </div>
+            </div>
+            <!-- Preview total box -->
+            <div id="rc-summary-box" style="background:var(--teal-l);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:14px;color:var(--teal);font-weight:500">ยอดรวมทั้งสิ้น</span>
+              <span id="rc-summary-val" style="font-size:26px;font-weight:700;color:var(--teal-d);font-family:var(--mono)">0 บาท</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
 <!-- Note Modal -->
 <div class="mo" id="mo-note">
   <div class="mo-box" style="width:540px">
@@ -837,6 +965,9 @@ select.form-control{cursor:pointer}
     <button class="mob-more-item" data-page="apply">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>แบบขอสินเชื่อ
     </button>
+    <button class="mob-more-item" data-page="receipt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>พิมพ์ใบเสร็จ
+    </button>
   </div>
 </nav>
 
@@ -851,7 +982,7 @@ let cache = { members:[], loans:[], payments:[], cashflow:[], npl:[] };
 let currentPage = 'dashboard';
 
 const SHEET_NAMES = ['members','loans','payments','cashflow','npl','shares','notes'];
-const PAGE_TITLES = {dashboard:'ภาพรวม',members:'ทะเบียนสมาชิก',loans:'ข้อมูลสินเชื่อ',payments:'บันทึกชำระ',cashflow:'รายรับ-จ่าย',npl:'หนี้ค้าง / NPL',shares:'จัดการหุ้นสมาชิก',report:'สรุปรายเดือน/รายปี',notes:'โน้ต/บันทึกเอกสาร',apply:'แบบขอสินเชื่อ'};
+const PAGE_TITLES = {dashboard:'ภาพรวม',members:'ทะเบียนสมาชิก',loans:'ข้อมูลสินเชื่อ',payments:'บันทึกชำระ',cashflow:'รายรับ-จ่าย',npl:'หนี้ค้าง / NPL',shares:'จัดการหุ้นสมาชิก',report:'สรุปรายเดือน/รายปี',notes:'โน้ต/บันทึกเอกสาร',apply:'แบบขอสินเชื่อ',receipt:'พิมพ์ใบเสร็จรับเงิน'};
 
 // ========== SETUP ==========
 function connectSheet() {
@@ -1049,7 +1180,7 @@ document.querySelectorAll('.nav-item').forEach(el => {
 });
 
 function renderPage(pg) {
-  const map = {dashboard: renderDashboard, members: renderMembers, loans: renderLoans, payments: renderPayments, cashflow: renderCashflow, npl: renderNpl, shares: renderShares, report: renderReport, notes: renderNotes, apply: initApply};
+  const map = {dashboard: renderDashboard, members: renderMembers, loans: renderLoans, payments: renderPayments, cashflow: renderCashflow, npl: renderNpl, shares: renderShares, report: renderReport, notes: renderNotes, apply: initApply, receipt: initReceipt};
   if (map[pg]) map[pg]();
 }
 
@@ -2921,6 +3052,287 @@ window.addEventListener('resize', () => {
     }
   }, 200);
 });
+
+
+// ╔══════════════════════════════════════════════════╗
+// ║         ใบเสร็จรับเงิน — RECEIPT SYSTEM          ║
+// ╚══════════════════════════════════════════════════╝
+
+let rcItems = [];   // [{desc, qty, price}]
+let rcNextId = 1;
+
+function initReceipt() {
+  // Set default values on page load
+  if (!document.getElementById('rc-date').value)
+    document.getElementById('rc-date').value = today();
+  if (!document.getElementById('rc-no').value)
+    document.getElementById('rc-no').value = 'RCP-' + Date.now().toString().slice(-5);
+
+  // Populate member select
+  const sel = document.getElementById('rc-payer-sel');
+  if (sel) {
+    sel.innerHTML = '<option value="">— เลือกสมาชิก —</option>' +
+      (cache.members||[]).map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+
+  // Add first row if empty
+  if (rcItems.length === 0) {
+    rcItems = [{ id: rcNextId++, desc: '', qty: 1, price: 0 }];
+  }
+  renderReceiptItems();
+}
+
+function fillReceiptPayer() {
+  const sel = document.getElementById('rc-payer-sel');
+  const id = sel.value;
+  const m = (cache.members||[]).find(x => x.id === id);
+  if (m) {
+    document.getElementById('rc-payer').value = m.name;
+    document.getElementById('rc-addr').value = m.addr || '';
+    document.getElementById('rc-phone').value = m.phone || '';
+  }
+}
+
+function addReceiptItem() {
+  rcItems.push({ id: rcNextId++, desc: '', qty: 1, price: 0 });
+  renderReceiptItems();
+}
+
+function removeReceiptItem(id) {
+  rcItems = rcItems.filter(r => r.id !== id);
+  if (rcItems.length === 0) rcItems.push({ id: rcNextId++, desc: '', qty: 1, price: 0 });
+  renderReceiptItems();
+}
+
+function updateReceiptItem(id, field, val) {
+  const item = rcItems.find(r => r.id === id);
+  if (!item) return;
+  if (field === 'qty' || field === 'price') {
+    item[field] = Number(val) || 0;
+  } else {
+    item[field] = val;
+  }
+  recalcReceipt();
+}
+
+function renderReceiptItems() {
+  const tbody = document.getElementById('rc-items-body');
+  if (!tbody) return;
+  tbody.innerHTML = rcItems.map((item, i) => `
+    <tr id="rc-row-${item.id}">
+      <td style="text-align:center;color:var(--g5);font-size:13px">${i + 1}</td>
+      <td>
+        <input class="form-control" value="${escHtml(item.desc)}"
+          oninput="updateReceiptItem(${item.id},'desc',this.value)"
+          placeholder="รายละเอียดรายการ เช่น ค่างวดสินเชื่อ งวดที่ 3"
+          style="border:none;box-shadow:none;padding:6px 8px;font-size:13px;background:transparent;width:100%">
+      </td>
+      <td>
+        <input type="number" class="form-control" value="${item.qty}" min="1"
+          oninput="updateReceiptItem(${item.id},'qty',this.value)"
+          style="border:none;box-shadow:none;padding:6px 8px;font-size:13px;text-align:center;background:transparent;width:100%">
+      </td>
+      <td>
+        <input type="number" class="form-control" value="${item.price}" min="0"
+          oninput="updateReceiptItem(${item.id},'price',this.value)"
+          style="border:none;box-shadow:none;padding:6px 8px;font-size:13px;text-align:right;background:transparent;width:100%">
+      </td>
+      <td style="font-weight:600;font-family:var(--mono);font-size:13px;text-align:right;padding:8px 14px;color:var(--teal-d)">
+        ${fmt(item.qty * item.price)}
+      </td>
+      <td class="no-print" style="text-align:center">
+        <button class="btn btn-danger btn-xs" onclick="removeReceiptItem(${item.id})" title="ลบรายการ">✕</button>
+      </td>
+    </tr>`).join('');
+  recalcReceipt();
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+
+function recalcReceipt() {
+  const grand = rcItems.reduce((s, r) => s + (r.qty * r.price), 0);
+  const gtEl = document.getElementById('rc-grand-total');
+  const svEl = document.getElementById('rc-summary-val');
+  if (gtEl) gtEl.textContent = fmt(grand);
+  if (svEl) svEl.textContent = fmt(grand) + ' บาท';
+}
+
+function clearReceipt() {
+  if (!confirm('ล้างฟอร์มทั้งหมด?')) return;
+  rcItems = [{ id: rcNextId++, desc: '', qty: 1, price: 0 }];
+  document.getElementById('rc-payer').value = '';
+  document.getElementById('rc-addr').value = '';
+  document.getElementById('rc-phone').value = '';
+  document.getElementById('rc-note').value = '';
+  document.getElementById('rc-no').value = 'RCP-' + Date.now().toString().slice(-5);
+  document.getElementById('rc-date').value = today();
+  document.getElementById('rc-payer-sel').value = '';
+  renderReceiptItems();
+  showToast('ล้างฟอร์มแล้ว');
+}
+
+// ── Print Receipt A4 ──────────────────────────────────
+function printReceipt() {
+  const rcNo    = document.getElementById('rc-no').value || 'RCP-' + Date.now().toString().slice(-4);
+  const rcDate  = document.getElementById('rc-date').value || today();
+  const rcTypeVal = document.getElementById('rc-type').value;
+  const rcTypeLabels = { receipt:'ใบเสร็จรับเงิน', invoice:'ใบแจ้งหนี้', payment:'หลักฐานการชำระ' };
+  const rcTypeLabel = rcTypeLabels[rcTypeVal] || rcTypeVal;
+  const payer   = document.getElementById('rc-payer').value || '—';
+  const addr    = document.getElementById('rc-addr').value || '—';
+  const phone   = document.getElementById('rc-phone').value || '—';
+  const payMethod = document.getElementById('rc-pay-method').value;
+  const note    = document.getElementById('rc-note').value;
+  const grand   = rcItems.reduce((s,r) => s+(r.qty*r.price), 0);
+
+  if (rcItems.every(r => !r.desc && r.price === 0)) {
+    showToast('กรุณากรอกรายการอย่างน้อย 1 รายการ','err'); return;
+  }
+
+  // Thai baht text
+  function bahtText(n) {
+    const ones=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'];
+    const tens=['','สิบ','ยี่สิบ','สามสิบ','สี่สิบ','ห้าสิบ','หกสิบ','เจ็ดสิบ','แปดสิบ','เก้าสิบ'];
+    if (n===0) return 'ศูนย์บาทถ้วน';
+    let s='',num=Math.floor(n),dec=Math.round((n-num)*100);
+    const places=['','สิบ','ร้อย','พัน','หมื่น','แสน','ล้าน'];
+    let digits=String(num).split('').reverse();
+    digits.forEach((d,i)=>{
+      let v=Number(d);
+      if(v===0) return;
+      if(i===1&&v===1) s='สิบ'+s;
+      else if(i===1&&v===2) s='ยี่สิบ'+s;
+      else if(i===1) s=tens[v]+s;
+      else s=ones[v]+places[i]+s;
+    });
+    s+='บาท';
+    if(dec>0){ let d1=Math.floor(dec/10),d2=dec%10; s+=(d1?tens[d1]:'')+(d2?ones[d2]:'')+' สตางค์'; }
+    else s+='ถ้วน';
+    return s||'ศูนย์บาทถ้วน';
+  }
+
+  const itemRows = rcItems.filter(r => r.desc||r.price).map((r,i) => `
+    <tr>
+      <td style="text-align:center;color:#555;font-size:10pt">${i+1}</td>
+      <td style="text-align:left;font-size:11pt;padding:5pt 8pt">${r.desc||'—'}</td>
+      <td style="text-align:center;font-size:10.5pt">${r.qty}</td>
+      <td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5pt">${r.price.toLocaleString('th-TH')}</td>
+      <td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11pt;font-weight:600;color:#4E342E">${(r.qty*r.price).toLocaleString('th-TH')}</td>
+    </tr>`).join('');
+
+  const LOGO = 'https://img2.pic.in.th/IMG_2615b9ad36d269046f0c.jpeg';
+
+  const html = `
+    <!-- HEADER -->
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3pt solid #F9A825;padding-bottom:5mm;margin-bottom:5mm">
+      <div style="display:flex;align-items:center;gap:10pt">
+        <img src="${LOGO}" style="width:60pt;height:60pt;object-fit:contain;border-radius:8pt;border:1.5pt solid #F9A825;flex-shrink:0" onerror="this.style.display='none'">
+        <div>
+          <div style="font-size:17pt;font-weight:700;color:#4E342E">กลุ่มออมทรัพย์นะห์ลา</div>
+          <div style="font-size:10pt;color:#555;margin-top:1pt">NAHLA SAVINGS GROUP · อ.รือเสาะ จ.นราธิวาส</div>
+          <div style="font-size:10pt;color:#555">ระบบ Murabahah · ปลอดดอกเบี้ย</div>
+        </div>
+      </div>
+      <div style="background:#FFF8E1;border:2pt solid #F9A825;border-radius:6pt;padding:8pt 14pt;text-align:center;min-width:100pt">
+        <div style="font-size:9pt;color:#555;font-weight:600">${rcTypeLabel}</div>
+        <div style="font-size:15pt;font-weight:700;color:#4E342E;font-family:'IBM Plex Mono',monospace">${rcNo}</div>
+        <div style="font-size:9pt;color:#555;margin-top:2pt">วันที่ ${fmtDate(rcDate)}</div>
+      </div>
+    </div>
+
+    <!-- TITLE -->
+    <div style="text-align:center;margin-bottom:5mm">
+      <div style="font-size:17pt;font-weight:700;color:#4E342E">${rcTypeLabel}</div>
+      <div style="font-size:10pt;color:#777;margin-top:2pt">Receipt · กลุ่มออมทรัพย์นะห์ลา</div>
+    </div>
+
+    <!-- PAYER INFO -->
+    <div style="border:1pt solid #bbb;margin-bottom:4mm">
+      <div style="display:grid;grid-template-columns:80pt 1fr 80pt 1fr">
+        <div style="background:#f5faf8;font-weight:600;font-size:10pt;color:#444;padding:5pt 8pt;border-right:1pt solid #ddd;border-bottom:1pt solid #ddd">ชื่อผู้ชำระ</div>
+        <div style="font-size:11pt;font-weight:700;padding:5pt 8pt;border-right:1pt solid #ddd;border-bottom:1pt solid #ddd">${payer}</div>
+        <div style="background:#f5faf8;font-weight:600;font-size:10pt;color:#444;padding:5pt 8pt;border-right:1pt solid #ddd;border-bottom:1pt solid #ddd">เบอร์โทร</div>
+        <div style="font-size:11pt;padding:5pt 8pt;font-family:'IBM Plex Mono',monospace;border-bottom:1pt solid #ddd">${phone}</div>
+        <div style="background:#f5faf8;font-weight:600;font-size:10pt;color:#444;padding:5pt 8pt;border-right:1pt solid #ddd">ที่อยู่</div>
+        <div style="font-size:10.5pt;color:#444;padding:5pt 8pt;border-right:1pt solid #ddd" colspan="3">${addr}</div>
+        <div style="background:#f5faf8;font-weight:600;font-size:10pt;color:#444;padding:5pt 8pt;border-right:1pt solid #ddd">วิธีชำระ</div>
+        <div style="font-size:10.5pt;padding:5pt 8pt">${payMethod}</div>
+      </div>
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <table style="width:100%;border-collapse:collapse;border:1pt solid #999;margin-bottom:0;font-size:10.5pt">
+      <thead>
+        <tr>
+          <th style="background:#4E342E;color:#FFD600;padding:6pt 8pt;text-align:center;border:1pt solid #3E2723;width:30pt">#</th>
+          <th style="background:#4E342E;color:#FFD600;padding:6pt 8pt;text-align:left;border:1pt solid #3E2723">รายการ / คำอธิบาย</th>
+          <th style="background:#4E342E;color:#FFD600;padding:6pt 8pt;text-align:center;border:1pt solid #3E2723;width:45pt">จำนวน</th>
+          <th style="background:#4E342E;color:#FFD600;padding:6pt 8pt;text-align:right;border:1pt solid #3E2723;width:80pt">ราคา/หน่วย</th>
+          <th style="background:#4E342E;color:#FFD600;padding:6pt 8pt;text-align:right;border:1pt solid #3E2723;width:90pt">รวม (บาท)</th>
+        </tr>
+      </thead>
+      <tbody>${itemRows}</tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="border:1pt solid #F9A825;padding:6pt 8pt;background:#FFF8E1;text-align:right;font-size:9.5pt;color:#555">
+            <em>${bahtText(grand)}</em>
+          </td>
+          <td style="border:1pt solid #F9A825;background:#FFF8E1;text-align:right;font-weight:700;font-size:11pt;padding:6pt 8pt">รวมทั้งสิ้น</td>
+          <td style="border:2pt solid #F9A825;background:#FFF8E1;text-align:right;font-weight:700;font-size:15pt;color:#A32D2D;padding:6pt 10pt;font-family:'IBM Plex Mono',monospace">${grand.toLocaleString('th-TH')}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- NOTE -->
+    ${note ? `<div style="background:#fffbf0;border:1pt solid #fac775;border-radius:4pt;padding:6pt 10pt;margin-top:3mm;font-size:10pt;color:#5C4000"><strong>หมายเหตุ:</strong> ${note}</div>` : ''}
+
+    <!-- PAYMENT CHANNEL -->
+    <div style="border:2pt solid #F9A825;border-radius:6pt;padding:8pt 14pt;margin:4mm 0;display:grid;grid-template-columns:1fr 1fr;gap:10pt;background:#FFFDE7;align-items:center">
+      <div>
+        <div style="font-size:9.5pt;color:#555;font-weight:600;margin-bottom:3pt">ช่องทางชำระเงิน</div>
+        <div style="font-size:13pt;font-weight:700;color:#4E342E">${BANK_INFO.name}</div>
+        <div style="font-size:11pt;color:#555">${BANK_INFO.bank}</div>
+        <div style="font-size:12pt;font-weight:700;color:#8B6914;font-family:'IBM Plex Mono',monospace">${BANK_INFO.account}</div>
+      </div>
+      <div style="border-left:1pt solid #F9A825;padding-left:14pt">
+        <div style="font-size:9.5pt;color:#555;font-weight:600;margin-bottom:3pt">PromptPay</div>
+        <div style="font-size:20pt;font-weight:700;color:#4E342E;font-family:monospace;letter-spacing:2pt">${BANK_INFO.promptpay}</div>
+        <div style="font-size:9pt;color:#555;margin-top:3pt">${BANK_INFO.note}</div>
+      </div>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14pt;margin-top:8mm;text-align:center">
+      <div>
+        <div style="border:2pt dashed #F9A825;border-radius:6pt;width:70pt;height:50pt;display:flex;align-items:center;justify-content:center;font-size:9pt;color:#8B6914;margin:0 auto;text-align:center;line-height:1.4">ตราประทับ<br>กลุ่มนะห์ลา</div>
+      </div>
+      <div>
+        <div style="height:40pt"></div>
+        <div style="border-top:1.5pt solid #999;padding-top:4pt;font-size:9.5pt;color:#444">ลายมือชื่อผู้รับเงิน</div>
+        <div style="font-size:10.5pt;font-weight:600;margin-top:3pt">(……………………………………)</div>
+        <div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div>
+      </div>
+      <div>
+        <div style="height:40pt"></div>
+        <div style="border-top:1.5pt solid #999;padding-top:4pt;font-size:9.5pt;color:#444">ลายมือชื่อผู้ชำระ</div>
+        <div style="font-size:10.5pt;font-weight:600;margin-top:3pt">(${payer})</div>
+        <div style="font-size:9pt;color:#666;margin-top:3pt">วันที่ ……/……/……</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="border-top:2pt solid #F9A825;margin-top:6mm;padding-top:4pt;display:flex;justify-content:space-between;font-size:9pt;color:#666">
+      <span>กลุ่มออมทรัพย์นะห์ลา · Nahla Savings Group · Riba-Free</span>
+      <span>พิมพ์วันที่ ${fmtDate(today())}</span>
+    </div>`;
+
+  openPrintWindow(html);
+}
+
+// ── Mobile nav: add receipt ───────────────────────────
+// (Receipt is in "more" menu via nav-item[data-page=receipt])
 
 // ========== CLOCK ==========
 function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleString('th-TH', { year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit' }); }
